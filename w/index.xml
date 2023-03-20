@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/</link>
+    <description>Recent content in Oliver Nguyen</description>
+    
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Mon, 20 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Pull data from HackerNews API and dump to JSON files</title>
+      <link>https://iOliverNguyen.github.io/w/hackernews/</link>
+      <pubDate>Mon, 20 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/hackernews/</guid>
+      <description>I wrote a simple script to download the HackerNews data from HackerNews API. It downloads the data in JSON format and stores it as a collection of files. The first time it runs, it will create the directory data to store the data. Subsequent runs will update the data in the directory.
+At the time of this writing, the HackerNew database has about 35 million items.
+Usage cd hackernews direnv allow go run .</description>
+    </item>
+    
+    <item>
+      <title>Visualize flow documents and ETA flow descriptors</title>
+      <link>https://iOliverNguyen.github.io/w/flow.doc/</link>
+      <pubDate>Wed, 15 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/flow.doc/</guid>
+      <description>At my work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors.
+Flow documents are a collection of nodes and edges, which are JSON objects. They are used to describe the flow of an automation chatbot. The flow compiler takes a flow document and compile it into an ETA flow descriptor, that is used by the ETA engine to run the flow. ETA is short for &amp;ldquo;Event-Action-Trigger&amp;rdquo;, a programming paradigm that is used to describe how to react (&amp;ldquo;action&amp;rdquo;) with each event matching a specific condition (&amp;ldquo;trigger&amp;rdquo;).</description>
+    </item>
+    
+    <item>
+      <title>Working with Stacked PRs using git-branchless, git-autofixup, and git-pr</title>
+      <link>https://iOliverNguyen.github.io/w/stacked.prs/</link>
+      <pubDate>Sun, 19 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/stacked.prs/</guid>
+      <description>I usually work with stacked PRs. It is a great way to organize my work. I was using sapling and it works really well. I can view stacked commits with sl smart logs, edit many files and make changes to many commits at the same time with sl absorb, have the stack automatically rebase after each change, and push these commits as multiple stacked GitHub PRs with a single sl pr command.</description>
+    </item>
+    
+    <item>
+      <title>Where does Github CLI store its credentials?</title>
+      <link>https://iOliverNguyen.github.io/w/github.cli/</link>
+      <pubDate>Sat, 07 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/github.cli/</guid>
+      <description>When using sapling, it can access my github with my credentials by asking me to gh auto login. I was wondering where it stores these credentials: in the keychain, in a file, in the environment? It&amp;rsquo;s here:
+$ cat ~/.config/gh/hosts.yml github.com: user: iOliverNguyen oauth_token: gho_████████████████████████████ git_protocol: https </description>
+    </item>
+    
+    <item>
+      <title>Make goconvey work with gomega assertion</title>
+      <link>https://iOliverNguyen.github.io/w/goconvey.gomega/</link>
+      <pubDate>Sun, 25 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/goconvey.gomega/</guid>
+      <description>At work, we use gomega for testing. It works well, until one day it becomes too verbose and goconvey becomes a better fit. To prevent the repository from using two different sets of assertion functions, I decided to write an adapter to make goconvey work with gomega assertion functions.
+gomega gomega is a testing framework for Go. Here&amp;rsquo;s what it looks like:
+package example_test import ( &amp;#34;fmt&amp;#34; &amp;#34;testing&amp;#34; . &amp;#34;github.com/onsi/ginkgo&amp;#34; .</description>
+    </item>
+    
+    <item>
+      <title>Make sapling work with direnv</title>
+      <link>https://iOliverNguyen.github.io/w/sapling.direnv/</link>
+      <pubDate>Tue, 20 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/sapling.direnv/</guid>
+      <description>In the last post, I shared my experience with Sapling, Meta’s new Git client. It requires some workaround with direnv. This post explains the change in details.
+At work, we are using direnv for quickly managing environment variables on our repository. When we cd into a directory, or a subtree, it automatically detects the file .envrc in the current directory (or the nearest parent directory), loads environment variables, and execute predefined commands.</description>
+    </item>
+    
+    <item>
+      <title>My first impressions of Sapling — Meta’s new Git client</title>
+      <link>https://iOliverNguyen.github.io/w/sapling/</link>
+      <pubDate>Fri, 16 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/sapling/</guid>
+      <description>Sapling is a new source control system developed by Meta. Recently, it gains the ability to work with GitHub. I&amp;rsquo;m curious about how it works, so I decided to give it a try and end up using it daily on my company&amp;rsquo;s repositories. If you want to try it out, check their documentation here.
+Stacked PRs When developing, I usually create a single commit for each PR and stack them together.</description>
+    </item>
+    
+    <item>
+      <title>The Immune System: What happens when you get a small cut?</title>
+      <link>https://iOliverNguyen.github.io/w/immune/</link>
+      <pubDate>Thu, 01 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/immune/</guid>
+      <description>We know that our blood contains white blood cells. And we probably heard of macrophages and T-Cells. But the immune system has so much more. The book Immune from Philipp Dettmer, the author of Kurzgesagt channel, will provide insights into the beautiful mechanisms of our immune system. This article is my summary of our immune system, what they are and how they protect our body.
+The immune system can be divided into the Innate immune system and the Adaptive immune system.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Packing web app as desktop app on Mac without Electron</title>
+      <link>https://iOliverNguyen.github.io/w/til.mac.app/</link>
+      <pubDate>Wed, 30 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/til.mac.app/</guid>
+      <description>gluon Recently, I found gluon. It is a framework for building desktop applications using web technologies. Unlike Electron, it uses the System installed Chromium or Firefox instead of the bundled Chromium. This makes it possible to use the same version of Chromium or Firefox as the one used by the user&amp;rsquo;s browser. This also makes the application significantly smaller. At the time of this TIL, the gluon framework is only a few weeks old.</description>
+    </item>
+    
+    <item>
+      <title>Latest JavaScript features in 2022</title>
+      <link>https://iOliverNguyen.github.io/w/js2022/</link>
+      <pubDate>Thu, 15 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/js2022/</guid>
+      <description>JavaScript is changing fast with a lot of new and exciting features to help us - developers write code better and better. These features have been released for a while. Let’s check them out!
+1. Private fields Previously, all class fields must be defined in the constructor. And there is no private fields. All fields can be accessed from outside. Of course, there are tricks with scope to make some variables inaccessible.</description>
+    </item>
+    
+    <item>
+      <title>TIL: File descriptor 3</title>
+      <link>https://iOliverNguyen.github.io/w/fd3/</link>
+      <pubDate>Sun, 03 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/fd3/</guid>
+      <description>Linux There are three standard file descriptions, STDIN, STDOUT, and STDERR. They are assigned to 0, 1, and 2 respectively.
+File descriptor 3, 4 and so on can be accessed at:
+/proc/12345/fd/3 I found it when looking at this Patchset. Chromium open --remote-debugging-pipe at file descriptor 3 for output and file descriptor 4 for input.
+Windows? </description>
+    </item>
+    
+    <item>
+      <title>TIL: git am</title>
+      <link>https://iOliverNguyen.github.io/w/git/</link>
+      <pubDate>Thu, 30 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/git/</guid>
+      <description>TIL: Git How to apply a patch from github into the current repository gh pr diff --patch 4 | git am git am Apply a series of patches from a mailbox.</description>
+    </item>
+    
+    <item>
+      <title>TIL: 10 most relaxing songs to reduce anxiety, according to neuroscientists</title>
+      <link>https://iOliverNguyen.github.io/w/relax.songs/</link>
+      <pubDate>Sat, 18 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/relax.songs/</guid>
+      <description>According to neuroscientists, music can reduce anxiety and stress. They suggested a list of the ten most relaxing songs to reduce anxiety:
+ &amp;ldquo;Weightless,&amp;rdquo; by Marconi Union &amp;ldquo;Electra,&amp;rdquo; by Airstream &amp;ldquo;Mellomaniac (Chill Out Mix),&amp;rdquo; by DJ Shah &amp;ldquo;Watermark,&amp;rdquo; by Enya &amp;ldquo;Strawberry Swing,&amp;rdquo; by Coldplay &amp;ldquo;Please Don&amp;rsquo;t Go,&amp;rdquo; by Barcelona &amp;ldquo;Pure Shores,&amp;rdquo; by All Saints &amp;ldquo;Someone Like You,&amp;rdquo; by Adele &amp;ldquo;Canzonetta Sull&amp;rsquo;aria,&amp;rdquo; by Mozart &amp;ldquo;We Can Fly,&amp;rdquo; by Rue du Soleil (Café Del Mar)  The top song is especially designed to reduce anxiety.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Run Go tests inside WASM</title>
+      <link>https://iOliverNguyen.github.io/w/wasmgo.testing/</link>
+      <pubDate>Fri, 17 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/wasmgo.testing/</guid>
+      <description>const go = new Go(); WebAssembly.instantiateStreaming(fetch(&#34;go/exec.wasm&#34;), go.importObject).then((result) = { go.run(result.instance); console.log(&#39;loaded wasm&#39;); });   Given the string  It should have length   &amp;nbsp;     const form$ = document.querySelector(&#39;#box1 form&#39;); const inputStr$ = document.querySelector(&#39;#box1 input[name=input-string]&#39;); const inputLen$ = document.querySelector(&#39;#box1 input[name=input-length]&#39;); const output$ = document.querySelector(&#39;#box1 .output&#39;); form$.addEventListener(&#39;submit&#39;, (e) = { e.preventDefault(); let output = wasmExecute(inputStr$.value, inputLen$.value) || &#39;&amp;nbsp;&#39;; output = output.replaceAll(&#39;\n&#39;, &#39;
+&#39;); output$.</description>
+    </item>
+    
+    <item>
+      <title>TIL: WASM with Go and run it inside browser</title>
+      <link>https://iOliverNguyen.github.io/w/wasmgo/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/wasmgo/</guid>
+      <description>const go = new Go(); WebAssembly.instantiateStreaming(fetch(&#34;go/uuid.wasm&#34;), go.importObject).then((result) = { go.run(result.instance); });   Number of UUIDs:   &amp;nbsp;     const form$ = document.querySelector(&#39;#box1 form&#39;); const input$ = document.querySelector(&#39;#box1 .input&#39;); const output$ = document.querySelector(&#39;#box1 .output&#39;); console.log(&#39;xx&#39;) form$.addEventListener(&#39;submit&#39;, (e) = { e.preventDefault(); console.log(&#39;xx&#39;) let output = wasmGenerateUUIDs(input$.value) || &#39;&amp;nbsp;&#39;; output = output.replaceAll(&#39;\n&#39;, &#39;
+&#39;); output$.innerHTML = output; })  Enter 1-10 in the above box. It should output UUIDs.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Ultralearning, by Scott Young</title>
+      <link>https://iOliverNguyen.github.io/w/untralearning/</link>
+      <pubDate>Thu, 09 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/untralearning/</guid>
+      <description>Ultralearning is a book from Scott Young. He spent time learning a lot. Like spending 1 year in 4 non-English countries, each country in 3 months, to learn speaking foreign languages.
+Make a metalearning map Design your goals and scopes. Determine exactly what you want at the end. Spend the first 10% of time to answer:
+ What concepts do I need to understand? What facts do I have to memorize?</description>
+    </item>
+    
+    <item>
+      <title>TIL: Include HTML file in a post with Hugo</title>
+      <link>https://iOliverNguyen.github.io/w/gohugo/</link>
+      <pubDate>Mon, 06 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/gohugo/</guid>
+      <description>Shortcode are simple snippets inside your content files calling built-in or custom templates.
+Include HTML file in a post Create layouts/shortcodes/include-html.html:
+{{ $file := .Get 0 }} {{ (printf &amp;#34;%s%s&amp;#34; .Page.File.Dir $file) | readFile | safeHTML }} Then use it in your content files:
+{{​&amp;lt; include-html &amp;#34;embedded.html&amp;#34; &amp;gt;}} </description>
+    </item>
+    
+    <item>
+      <title>TIL: Better Memory</title>
+      <link>https://iOliverNguyen.github.io/w/memory/</link>
+      <pubDate>Thu, 02 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/memory/</guid>
+      <description>Memory tips by BigThink.com
+ Chronic stress is really bad for our memory. It make us tired and loose attention. Stress hormones mobilize your brain and body to respond, to fight, to flee, to react quickly - not to think. Get enough sleep. If you don&amp;rsquo;t get enough sleep, your hippocampus might not have enough time to consolidate memories. You remember when you pay attention. Don&amp;rsquo;t multitask. Repetition is good. Self testing.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Beware of Nil UUID when updating database with gorm!</title>
+      <link>https://iOliverNguyen.github.io/w/db.nil.uuid/</link>
+      <pubDate>Wed, 30 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/db.nil.uuid/</guid>
+      <description>WHERE conditions required At work, we are using gorm for dealing with database. It&amp;rsquo;s a popular SQL manipulation library in Go.
+But recently, we got a scary error:
+can not update row: id=00000000-0000-0000-0000-000000000000 WHERE conditions required Which happened from this code snippet:
+db, _ := gorm.Open(...) paper := &amp;amp;Paper{ ID: updateID, Name: &amp;#34;new name&amp;#34;, } db.Update(paper) The above code will generate the following SQL statement:
+UPDATE &amp;#34;paper&amp;#34; SET &amp;#34;name&amp;#34; = $1, &amp;#34;updated_at&amp;#34; = $2 WHERE &amp;#34;paper&amp;#34;.</description>
+    </item>
+    
+    <item>
+      <title>Compare and swap in Redis</title>
+      <link>https://iOliverNguyen.github.io/w/redis.cas/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/redis.cas/</guid>
+      <description>Compare and swap Compare and swap is a familiar concept of atomic operation, for dealing with race condition. Suppose we want to build a lock for multiple instances to execute some command, and only one can be executed at a given time. An instance must wait for the lock to be released before it can take.
+Instance 1: Current value is empty, set it to 1 and take the lock. Instance 2: Current value is not empty, wait.</description>
+    </item>
+    
+    <item>
+      <title>Validate zero enum value in Protocol Buffer</title>
+      <link>https://iOliverNguyen.github.io/w/proto.enum/</link>
+      <pubDate>Tue, 01 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/proto.enum/</guid>
+      <description>How to validate that a Protobuf message does not contain enum fields with zero value? Turn out that is not supported directly by Protobuf! We need to look into how protojson package is implemented.
+More and more companies are adopting gRPC with Protobuf for communication between internal services. It has the benefits of high performance, supporting multiple programming languages, and being backed by Google with a great ecosystem around.
+For communication with front-end and external services, Protobuf can be marshaled to JSON format.</description>
+    </item>
+    
+    <item>
+      <title>Eventual consistency and cache</title>
+      <link>https://iOliverNguyen.github.io/w/eventual.consistency/</link>
+      <pubDate>Tue, 22 Feb 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/eventual.consistency/</guid>
+      <description>What is it? Eventual consistency is a fancy name of doing something and only expecting the changed state after a while. And there is a guarantee that you will eventually get the expected state. Hence, consistency.
+But that won&amp;rsquo;t work well with caching. And I had to deal with that recently when working with WhatsApp API.
+When querying for a list of message templates from WhatsApp, we&amp;rsquo;ll cache the response for use later.</description>
+    </item>
+    
+    <item>
+      <title>Create an emoji ball-drop game with Matter.js</title>
+      <link>https://iOliverNguyen.github.io/w/emoji.drop/</link>
+      <pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/emoji.drop/</guid>
+      <description>You can&amp;rsquo;t connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future.
+⸺ Steve Jobs
+ Sometimes, stepping outside of your comfort zone and taking some side projects is a great way to improve as a developer. The more skills you acquire, the more you can do. And you may need them someday in the future.</description>
+    </item>
+    
+    <item>
+      <title>Front-End development without node_modules using Skypack and Snowpack</title>
+      <link>https://iOliverNguyen.github.io/w/skypack/</link>
+      <pubDate>Tue, 02 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/skypack/</guid>
+      <description>Once upon a time, we could simply put an HTML and a script file into an FTP server, quickly have a working website and call it a day.
+Today, we have to jump through many hoops just to get the right things in the right places. Suppose Alice wants to spend her weekend making a simple to-do app or whatever little idea she enjoys. First, she has to install a big heap of 10k npm packages files.</description>
+    </item>
+    
+    <item>
+      <title>µjson - A minimal JSON parser and transformer in Go</title>
+      <link>https://iOliverNguyen.github.io/w/ujson/</link>
+      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/ujson/</guid>
+      <description>µjson is a minimal JSON parser and transformer that works on unstructured (and trusted) JSON. It works by parsing input and calling the given callback function when encountering each item.
+Motivation Sometimes we just want to make some minimal changes to a JSON document or do some generic transformations without fully unmarshalling it. For example, removing blacklisted keys from response JSON. Why spend all the cost on unmarshalling into a map[string]interface{} just to immediately marshal it again.</description>
+    </item>
+    
+  </channel>
+</rss>

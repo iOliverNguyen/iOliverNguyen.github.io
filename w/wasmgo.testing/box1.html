@@ -1,0 +1,34 @@
+<div class="box" id="box1">
+  <form>
+    <div class="line">
+      <label class="label">Given the string</label>
+      <input name="input-string" value="Hello world!">
+    </div>
+    <div class="line">
+      <label class="label">It should have length</label>
+      <input name="input-length" value="10">
+    </div>
+    <div class="line">
+      <input type="submit" value="Run">
+    </div>
+    <div class="output">
+      &nbsp;
+    </div>
+  </form>
+</div>
+
+<script>
+  const form$ = document.querySelector('#box1 form');
+  const inputStr$ = document.querySelector('#box1 input[name=input-string]');
+  const inputLen$ = document.querySelector('#box1 input[name=input-length]');
+  const output$ = document.querySelector('#box1 .output');
+
+  form$.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    let output = wasmExecute(inputStr$.value, inputLen$.value) || '&nbsp;';
+    output = output.replaceAll('\n', '<br>');
+    output$.innerHTML = output;
+  })
+</script>
+

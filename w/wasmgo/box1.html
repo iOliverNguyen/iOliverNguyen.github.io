@@ -1,0 +1,31 @@
+<div class="box" id="box1">
+  <form>
+    <div class="line">
+      <label>Number of UUIDs:</label>
+      <input class="input" value="1">
+    </div>
+    <div class="line">
+      <input type="submit" value="Generate">
+    </div>
+    <div class="output">
+      &nbsp;
+    </div>
+  </form>
+</div>
+
+<script>
+  const form$ = document.querySelector('#box1 form');
+  const input$ = document.querySelector('#box1 .input');
+  const output$ = document.querySelector('#box1 .output');
+
+  console.log('xx')
+  form$.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    console.log('xx')
+    let output = wasmGenerateUUIDs(input$.value) || '&nbsp;';
+    output = output.replaceAll('\n', '<br>');
+    output$.innerHTML = output;
+  })
+</script>
+

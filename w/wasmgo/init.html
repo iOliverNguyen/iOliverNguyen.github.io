@@ -1,0 +1,7 @@
+<script src="/lib/wasm_exec.js"></script>
+<script>
+  const go = new Go();
+  WebAssembly.instantiateStreaming(fetch("go/uuid.wasm"), go.importObject).then((result) => {
+    go.run(result.instance);
+  });
+</script>

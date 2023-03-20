@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Working with Stacked PRs using git-branchless, git-autofixup, and git-pr on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/stacked.prs/</link>
+    <description>Recent content in Working with Stacked PRs using git-branchless, git-autofixup, and git-pr on Oliver Nguyen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Sun, 19 Feb 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/stacked.prs/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

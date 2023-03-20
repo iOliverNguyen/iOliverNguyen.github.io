@@ -1,0 +1,312 @@
+<!doctype html><html lang="en-us"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Make goconvey work with gomega assertion | Oliver Nguyen</title><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="all,follow"><meta name="googlebot" content="index,follow,snippet,archive"><meta name="og:site_name" content="Oliver Nguyen"><meta property="og:title" content="Make goconvey work with gomega assertion"><meta property="og:description" content="At work, we use gomega for testing. It works well, until one day it becomes too verbose and goconvey becomes a better fit. To prevent the repository from using two different sets of assertion functions, I decided to write an adapter to make goconvey work with gomega assertion functions."><meta property="og:type" content="article"><meta property="og:url" content="https://iOliverNguyen.github.io/w/goconvey.gomega/"><meta property="og:image" content="https://iOliverNguyen.github.io/images/ogx.png"><meta property="article:section" content="w"><meta property="article:published_time" content="2022-12-25T00:00:00+00:00"><meta property="article:modified_time" content="2022-12-25T00:00:00+00:00"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://iOliverNguyen.github.io/images/ogx.png"><meta name="twitter:title" content="Make goconvey work with gomega assertion"><meta name="twitter:description" content="At work, we use gomega for testing. It works well, until one day it becomes too verbose and goconvey becomes a better fit. To prevent the repository from using two different sets of assertion functions, I decided to write an adapter to make goconvey work with gomega assertion functions."><link rel="stylesheet" href="https://iOliverNguyen.github.io/css/style-classic.css"><link rel="stylesheet" href="https://iOliverNguyen.github.io/style.css"><link rel="icon" type="image/png" href="/images/favicon.png"><link href="https://iOliverNguyen.github.io/w/goconvey.gomega/index.xml" rel="alternate" type="application/rss+xml" title="Oliver Nguyen"><script async src="https://www.googletagmanager.com/gtag/js?id=G-L5X8RJDCLM"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-L5X8RJDCLM")</script><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></head><body class="max-width mx-auto px3 ltr"><div class="content index py4"><article class="post" itemscope itemtype="http://schema.org/BlogPosting"><header><h1 class="posttitle" itemprop="name headline">Make goconvey work with gomega assertion</h1><div class="meta"><div class="postdate"><time datetime="2022-12-25 00:00:00 &#43;0000 UTC" itemprop="datePublished">2022-12-25</time></div><div class="article-tag">&nbsp;· <a class="tag-link" href="/w/#go" rel="tag">go</a></div></div></header><div class="content" itemprop="articleBody"><p>At work, we use <a href="https://onsi.github.io/gomega/"><code>gomega</code></a> for testing. It works well, until one day it becomes too verbose and <a href="https://github.com/smartystreets/goconvey"><code>goconvey</code></a> becomes a better fit. To prevent the repository from using two different sets of assertion functions, I decided to write an adapter to make <code>goconvey</code> work with <code>gomega</code> assertion functions.</p><h2 id="gomega">gomega</h2><p><a href="https://onsi.github.io/gomega">gomega</a> is a testing framework for Go. Here&rsquo;s what it looks like:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;testing&#34;</span>
+
+    <span class="p">.</span> <span class="s">&#34;github.com/onsi/ginkgo&#34;</span>
+    <span class="p">.</span> <span class="s">&#34;github.com/onsi/gomega&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">Test</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">RegisterFailHandler</span><span class="p">(</span><span class="nx">Fail</span><span class="p">)</span>
+    <span class="nf">RunSpecs</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span> <span class="s">&#34;Example Suite&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">_</span> <span class="p">=</span> <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">s</span> <span class="kt">string</span>
+    <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="p">=</span> <span class="s">&#34;Start&#34;</span>
+    <span class="p">})</span>
+    <span class="nf">AfterEachfunc</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+    <span class="p">})</span>
+    <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+        <span class="p">})</span>
+        <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1&#34;</span>
+            <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1&#34;</span><span class="p">))</span>
+        <span class="p">})</span>
+        <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.2&#34;</span>
+            <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.2&#34;</span><span class="p">))</span>
+        <span class="p">})</span>
+    <span class="p">})</span>
+    <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Execute test 2&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2&#34;</span>
+        <span class="p">})</span>
+        <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 2.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2.1&#34;</span>
+        <span class="p">})</span>
+        <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 2.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2.2&#34;</span>
+            <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test2 -&gt; test2.2&#34;</span><span class="p">))</span>
+        <span class="p">})</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div><p>gomega/ginkgo uses a DSL to describe the test cases. <a href="https://pkg.go.dev/github.com/onsi/gomega#%ce%a9"><code>Ω()</code></a> is an alias of <a href="https://pkg.go.dev/github.com/onsi/gomega#Expect"><code>Expect()</code></a>. The execution order is:</p><ul><li>When running <code>Test 1.1</code>, it will execute in the following order:<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">BeforeEach</span><span class="p">()</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">BeforeEach</span><span class="p">()</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">AfterEach</span><span class="p">()</span>           <span class="c1">// print the output:
+</span><span class="c1"></span>                         <span class="c1">//   Start -&gt; test1 -&gt; test1.1
+</span></code></pre></div></li><li>When running <code>Test 2.2</code>, it will execute in the following order:<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">BeforeEach</span><span class="p">()</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">BeforeEach</span><span class="p">()</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.2&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">AfterEach</span><span class="p">()</span>           <span class="c1">// print the output:
+</span><span class="c1"></span>                         <span class="c1">//   Start -&gt; test1 -&gt; test1.2
+</span></code></pre></div></li><li>And so on.</li></ul><h2 id="goconvey">goconvey</h2><p><a href="https://github.com/smartystreets/goconvey">goconvey</a> is another testing framework for Go. Beside writing tests, it also has a nice web server to display the results with coverage report. But in this article, let&rsquo;s only focus on the test part. Here&rsquo;s what it looks like:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;testing&#34;</span>
+
+    <span class="p">.</span> <span class="s">&#34;github.com/smartystreets/goconvey/convey&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">Test</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="nx">t</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="o">:=</span> <span class="s">&#34;Start&#34;</span>
+        <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+        <span class="p">}()</span>
+
+        <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+            <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1&#34;</span><span class="p">)</span>
+
+            <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1&#34;</span>
+                <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1 -&gt; test1.1&#34;</span><span class="p">)</span>
+            <span class="p">})</span>
+            <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.2&#34;</span>
+                <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1 -&gt; test1.2&#34;</span><span class="p">)</span>
+            <span class="p">})</span>
+        <span class="p">})</span>
+        <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Execute test 2&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2&#34;</span>
+            <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test2&#34;</span><span class="p">)</span>
+
+            <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 2.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2.1&#34;</span>
+            <span class="p">})</span>
+            <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 2.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test2.2&#34;</span>
+                <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test2 -&gt; test2.2&#34;</span><span class="p">)</span>
+            <span class="p">})</span>
+        <span class="p">})</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div><p>Similar to the gomega example, the execution order is:</p><ul><li>When running <code>Test 1.1</code>, it will execute in the following order:<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span>          <span class="c1">// print the output:
+</span><span class="c1"></span>                         <span class="c1">//   Start -&gt; test1 -&gt; test1.1
+</span></code></pre></div></li><li>When running <code>Test 1.2</code>, it will execute in the following order:<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Execute test 1&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.2&#34;</span><span class="p">)</span>
+<span class="o">-</span><span class="p">&gt;</span> <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span>          <span class="c1">// print the output:
+</span><span class="c1"></span>                         <span class="c1">//   Start -&gt; test1 -&gt; test1.2
+</span></code></pre></div></li><li>And so on.</li></ul><h2 id="the-problem-and-why-goconvey-is-a-better-fit">The problem and why goconvey is a better fit</h2><p>From the two examples above, they are quite similar in test structure and can achieve the same execution order. Both of them can output <code>Start -&gt; test1 -&gt; test1.1\nStart -&gt; test1 -&gt; test1.2...</code>. But gomega is more verbose with the <code>Describe</code>, <code>BeforeEach</code>, <code>AfterEach</code> functions. On the other hand, goconvey is more concise and easy to read. But it&rsquo;s not quite a problem for a long time, and we are still happily dealing with it.</p><p>Until one day, we need to test a function with so many execution branches. Suddenly the test code with gomega becomes a mess.</p><p>Let&rsquo;s add another level with two sub-branches <code>Test 1.1.1</code> and <code>Test 1.1.2</code> to the gomega example:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kd">var</span> <span class="nx">_</span> <span class="p">=</span> <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">s</span> <span class="kt">string</span>
+    <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="p">=</span> <span class="s">&#34;Start&#34;</span>
+    <span class="p">})</span>
+    <span class="nf">AfterEachfunc</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+    <span class="p">})</span>
+    <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+        <span class="p">})</span>
+        <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1&#34;</span>
+            <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1&#34;</span><span class="p">))</span>
+
+            <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.1&#34;</span>
+                <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.1&#34;</span><span class="p">))</span>
+            <span class="p">})</span>
+            <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.2&#34;</span>
+                <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.2&#34;</span><span class="p">))</span>
+            <span class="p">})</span>
+        <span class="p">})</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">})</span>
+    <span class="cm">/* ... */</span>
+<span class="p">})</span>
+</code></pre></div><p>It won&rsquo;t work, because gomega does not allow nested <code>It()</code>. We have to refactor the tests to make it work:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kd">var</span> <span class="nx">_</span> <span class="p">=</span> <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">s</span> <span class="kt">string</span>
+    <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="p">=</span> <span class="s">&#34;Start&#34;</span>
+    <span class="p">})</span>
+    <span class="nf">AfterEachfunc</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+    <span class="p">})</span>
+    <span class="nf">Describe</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+        <span class="p">})</span>
+        <span class="nf">Context</span><span class="p">(</span><span class="s">&#34;Test 1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nf">BeforeEach</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1&#34;</span>
+                <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1&#34;</span><span class="p">))</span>
+            <span class="p">})</span>
+            <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.1&#34;</span>
+                <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.1&#34;</span><span class="p">))</span>
+            <span class="p">})</span>
+            <span class="nf">It</span><span class="p">(</span><span class="s">&#34;Test 1.1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.2&#34;</span>
+                <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.2&#34;</span><span class="p">))</span>
+            <span class="p">})</span>
+        <span class="p">})</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">})</span>
+    <span class="cm">/* ... */</span>
+<span class="p">})</span>
+</code></pre></div><p>In real-world code, imagine we have to move a lot of lines in and out of <code>It()</code> and <code>BeforeEach()</code>. Each time we want to add another level of branch. Too many lines changed. It&rsquo;s annoying, error-prone, not easy to edit, read and review.</p><p>But with <code>goconvey</code>, the experience is so smooth. We just need to add another level of <code>Convey()</code>. Existing lines do not need to be changed:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kd">func</span> <span class="nf">Test</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="nx">t</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="o">:=</span> <span class="s">&#34;Start&#34;</span>
+        <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+        <span class="p">}()</span>
+        
+        <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+            <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1&#34;</span><span class="p">)</span>
+            
+            <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1&#34;</span>
+                <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1 -&gt; test1.1&#34;</span><span class="p">)</span>
+                
+                <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.1.1:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.1&#34;</span>
+                    <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.1&#34;</span><span class="p">)</span>
+                <span class="p">})</span>
+                <span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Test 1.1.2:&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1.1.2&#34;</span>
+                    <span class="nf">So</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">ShouldEqual</span><span class="p">,</span> <span class="s">&#34;Start -&gt; test1 -&gt; test1.1 -&gt; test1.1.2&#34;</span><span class="p">)</span>
+                <span class="p">})</span>
+            <span class="p">})</span> 
+            <span class="cm">/* ... */</span>
+        <span class="p">})</span> 
+        <span class="cm">/* ... */</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="make-goconvey-work-with-gomega">Make goconvey work with gomega</h2><p>But we still want to use <code>gomega</code>&rsquo;s <code>Ω()</code> functions. Keeping two sets of assertions in our source code will be confusing, especially for new people. Let&rsquo;s make it work with <code>goconvey</code>.</p><p>Here&rsquo;s how the final code looks like (full version can be found <a href="https://gist.github.com/iOliverNguyen/e955548e7b1eecac1367a3051548eceb">here</a>):</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">xconvey</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="c1">// Workaround for ginkgo flags used in CI test commands. Without this import, ginkgo flags are not registered and
+</span><span class="c1"></span>    <span class="c1">// the command &#34;go test -v ./... -ginkgo.v&#34; will fail. But for some other reason, ginkgo can not be imported from
+</span><span class="c1"></span>    <span class="c1">// both test and non-test packages (error: flag redefined: ginkgo.seed). So test files using this package (xconvey)
+</span><span class="c1"></span>    <span class="c1">// must NOT import ginkgo.
+</span><span class="c1"></span>    <span class="nx">_</span> <span class="s">&#34;github.com/onsi/ginkgo&#34;</span>
+
+    <span class="s">&#34;github.com/onsi/gomega&#34;</span>
+    <span class="nx">gomegatypes</span> <span class="s">&#34;github.com/onsi/gomega/types&#34;</span>
+    <span class="s">&#34;github.com/smartystreets/goconvey/convey&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">Convey</span><span class="p">(</span><span class="nx">items</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">defer</span> <span class="nf">conveyGomegaSetup</span><span class="p">(</span><span class="nx">items</span><span class="o">...</span><span class="p">)()</span>
+    <span class="nx">convey</span><span class="p">.</span><span class="nf">Convey</span><span class="p">(</span><span class="nx">items</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">conveyGomegaSetup</span><span class="p">(</span><span class="nx">items</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">items</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">{</span>
+        <span class="nx">testT</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].(</span><span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+            <span class="nx">gomega</span><span class="p">.</span><span class="nx">Default</span> <span class="p">=</span> <span class="nx">gomega</span><span class="p">.</span><span class="nf">NewWithT</span><span class="p">(</span><span class="nx">testT</span><span class="p">).</span>
+                <span class="nf">ConfigureWithFailHandler</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">message</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">callerSkip</span> <span class="o">...</span><span class="kt">int</span><span class="p">)</span> <span class="p">{})</span>
+            <span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+                <span class="cm">/* clean up */</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">Ωx</span><span class="p">(</span><span class="nx">actual</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">extra</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="nx">gomega</span><span class="p">.</span><span class="nx">Assertion</span> <span class="p">{</span>
+    <span class="nx">assertion</span> <span class="o">:=</span> <span class="nx">gomega</span><span class="p">.</span><span class="nf">Expect</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">extra</span><span class="o">...</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">conveyGomegaAssertion</span><span class="p">{</span><span class="nx">actual</span><span class="p">:</span> <span class="nx">actual</span><span class="p">,</span> <span class="nx">assertion</span><span class="p">:</span> <span class="nx">assertion</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">conveyGomegaAssertion</span> <span class="kd">struct</span> <span class="p">{</span>
+    <span class="nx">actual</span>    <span class="nx">any</span>
+    <span class="nx">assertion</span> <span class="nx">gomega</span><span class="p">.</span><span class="nx">Assertion</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">conveyGomegaAssertion</span><span class="p">)</span> <span class="nf">To</span><span class="p">(</span><span class="nx">matcher</span> <span class="nx">gomegatypes</span><span class="p">.</span><span class="nx">GomegaMatcher</span><span class="p">,</span> <span class="nx">optionalDescription</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">optionalDescription</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;optionalDescription is not supported&#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">convey</span><span class="p">.</span><span class="nf">So</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">_</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">_</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+        <span class="nx">success</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">matcher</span><span class="p">.</span><span class="nf">Match</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;ERROR: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">!</span><span class="nx">success</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">matcher</span><span class="p">.</span><span class="nf">FailureMessage</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="s">&#34;&#34;</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">conveyGomegaAssertion</span><span class="p">)</span> <span class="nf">ToNot</span><span class="p">(</span><span class="nx">matcher</span> <span class="nx">gomegatypes</span><span class="p">.</span><span class="nx">GomegaMatcher</span><span class="p">,</span> <span class="nx">optionalDescription</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">optionalDescription</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;optionalDescription is not supported&#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">convey</span><span class="p">.</span><span class="nf">So</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">_</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">_</span> <span class="o">...</span><span class="nx">any</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+        <span class="nx">success</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">matcher</span><span class="p">.</span><span class="nf">Match</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;ERROR: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">success</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">matcher</span><span class="p">.</span><span class="nf">NegatedFailureMessage</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">actual</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="s">&#34;&#34;</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div><p>And usage:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">example_test</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;testing&#34;</span>
+    
+    <span class="p">.</span> <span class="s">&#34;github.com/onsi/gomega&#34;</span>
+    <span class="s">&#34;github.com/example/xconvey&#34;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span> <span class="nf">Test</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">Ω</span> <span class="o">:=</span> <span class="nx">xconvey</span><span class="p">.</span><span class="nx">Ωx</span> <span class="c1">// adapter to make goconvey work with gomega
+</span><span class="c1"></span>    <span class="nx">xconvey</span><span class="p">.</span><span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;PathTraversal&#34;</span><span class="p">,</span> <span class="nx">t</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">s</span> <span class="o">:=</span> <span class="s">&#34;Start&#34;</span>
+        <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+        <span class="p">}()</span>
+
+        <span class="nx">xconvey</span><span class="p">.</span><span class="nf">Convey</span><span class="p">(</span><span class="s">&#34;Executing test 1&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">s</span> <span class="o">+=</span> <span class="s">&#34; -&gt; test1&#34;</span>
+            <span class="nx">Ω</span><span class="p">(</span><span class="nx">s</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nf">Equal</span><span class="p">(</span><span class="s">&#34;Start -&gt; test1&#34;</span><span class="p">))</span>
+        <span class="p">})</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">})</span>
+<span class="p">}</span> 
+</code></pre></div><h3 id="some-notes">Some notes:</h3><ul><li><code>xconvey.Convey()</code> is our wrapper function for <code>convey.Convey()</code>. It calls <code>conveyGomegaSetup()</code> to setup <code>gomega</code> before calling <code>convey.Convey()</code>.</li><li><code>gomega</code> requires <code>*testing.T</code> and <code>Fail()</code> to be set up before using <code>Ω()</code>. <code>goconvey</code> requires <code>*testing.T</code> at the top level <code>Convey()</code>. Our function <code>conveyGomegaSetup()</code> detects the top level <code>Convey()</code> then sets up necessary things for <code>gomega</code>.</li><li><code>Ωx()</code> is a wrapper around <code>gomega.Expect()</code>. It returns a <code>gomega.Assertion</code> object. We can use <code>To()</code>, <code>ToNot()</code> and other assertion methods on it to make assertions with <code>gomega</code> matchers.</li><li>Our CI runs <code>go test -v ./... -ginkgo.v</code>. I have to create a workaround to make the command work with <code>xconvey</code>/non-<code>ginkgo</code> package. Without the import of <code>ginkgo</code>, the command with fail (error: flag <code>ginkgo.v</code> is not defined). But <code>ginkgo</code> can not be imported into both test and non-test packages (error: flag redefined: <code>ginkgo.seed</code>). So I have to import it in the non-test package (<code>xconvey</code>) to make its flags always present in tests and make a requirement that test packages with <code>xconvey</code> must NOT import <code>ginkgo</code>. The subsequence is that we can not mix <code>gomega</code> with <code>xconvey</code> tests in the same package.</li></ul><h2 id="conclusion">Conclusion</h2><p>In the end, it works well. We can use <code>goconvey</code> to write tests with <code>gomega</code>. The code is clean and easy to read. We have the best of both worlds: keep using the familiar set of assertions while having the flexibility of goconvey.</p><h2 id="author">Author</h2><p>I'm Oliver Nguyen. A software maker working mostly in Go and JavaScript. I enjoy learning and seeing a better version of myself each day. Occasionally spin off new open source projects. Share knowledge and thoughts during my journey. <span>Connect with me on <a class="icon" target="_blank" rel="noopener" href="https://github.com/iOliverNguyen"><i class="fab fa-github"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://linkedin.com/in/iOliverNguyen"><i class="fab fa-linkedin"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://twitter.com/_OliverNguyen"><i class="fab fa-twitter"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://iOliverNguyen.medium.com"><i class="fab fa-medium-m"></i> </a>and <a class="icon" target="_blank" rel="noopener" href="mailto:iOliverNguyen@gmail.com"><i class="fas fa-envelope"></i> </a>.</span></p></div></article><div id="header-post"><a id="menu-icon" href="/w"><i class="fas fa-chevron-left fa-lg"></i> <span class="icon-text">Back</span></a> <a id="menu-icon-tablet" href="/w"><i class="fas fa-chevron-left fa-lg"></i> <span class="icon-text">Back</span></a></div><div id="footer-post-container"><div id="footer-post"><div id="nav-footer" style="display:none"><ul></ul></div><div id="toc-footer" class="tog-footer" style="display:none"><script>console.log("content",'<nav id="TableOfContents">\n  <ul>\n    <li><a href="#gomega">gomega</a></li>\n    <li><a href="#goconvey">goconvey</a></li>\n    <li><a href="#the-problem-and-why-goconvey-is-a-better-fit">The problem and why goconvey is a better fit</a></li>\n    <li><a href="#make-goconvey-work-with-gomega">Make goconvey work with gomega</a>\n      <ul>\n        <li><a href="#some-notes">Some notes:</a></li>\n      </ul>\n    </li>\n    <li><a href="#conclusion">Conclusion</a></li>\n  </ul>\n</nav>')</script><div class="toc-header"><a href="#">Make goconvey work with gomega assertion</a></div><nav id="TableOfContents"><ul><li><a href="#gomega">gomega</a></li><li><a href="#goconvey">goconvey</a></li><li><a href="#the-problem-and-why-goconvey-is-a-better-fit">The problem and why goconvey is a better fit</a></li><li><a href="#make-goconvey-work-with-gomega">Make goconvey work with gomega</a><ul><li><a href="#some-notes">Some notes:</a></li></ul></li><li><a href="#conclusion">Conclusion</a></li></ul></nav></div><div id="share-footer" class="tog-footer" style="display:none"><ul><li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fgoconvey.gomega%2f&title=Make%20goconvey%20work%20with%20gomega%20assertion"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fgoconvey.gomega%2f"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fgoconvey.gomega%2f&text=Make%20goconvey%20work%20with%20gomega%20assertion"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fgoconvey.gomega%2f&title=Make%20goconvey%20work%20with%20gomega%20assertion"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fgoconvey.gomega%2f&t=Make%20goconvey%20work%20with%20gomega%20assertion"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li></ul></div><div id="actions-footer"><a id="home" class="icon" href="/w"><i class="fas fa-chevron-left fa-lg" aria-hidden="true"></i> Back</a> <a id="toc" class="icon" href="#" onclick='return $(".tog-footer").toggle(),!1'><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a> <a id="share" class="icon" href="#" onclick='return $(".tog-footer").toggle(),!1'><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></div></div></div><footer id="footer"><div class="footer-left">Copyright &copy; 2023 Oliver Nguyen.</div><div class="footer-right"><nav><ul></ul></nav></div></footer></div></body><link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"><script src="/lib/jquery/jquery.min.js"></script><script src="/js/main.js"></script></html>

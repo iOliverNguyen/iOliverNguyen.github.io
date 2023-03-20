@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="41px" height="38px" viewBox="0 0 41 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-3384.000000, -1498.000000)" fill="#C42424" fill-rule="nonzero">
+            <g id="banner-game" transform="translate(1811.000000, 1173.000000)">
+                <g id="heart" transform="translate(1573.000000, 325.000000)">
+                    <path d="M20.1,37.828 L20.072,37.828 C14.906,37.732 0,24.264 0,11.508 C0,5.38 5.05,0 10.806,0 C15.386,0 18.466,3.16 20.098,5.46 C21.726,3.164 24.806,8.8817842e-16 29.388,8.8817842e-16 C35.148,8.8817842e-16 40.196,5.38 40.196,11.51 C40.196,24.262 25.288,37.73 20.122,37.824 L20.1,37.824 L20.1,37.828 Z" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My first impressions of Sapling — Meta’s new Git client on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/sapling/</link>
+    <description>Recent content in My first impressions of Sapling — Meta’s new Git client on Oliver Nguyen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Fri, 16 Dec 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/sapling/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>S on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/s/</link>
+    <description>Recent content in S on Oliver Nguyen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Thu, 15 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/s/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Latest JavaScript features in 2022</title>
+      <link>https://iOliverNguyen.github.io/s/js2022/</link>
+      <pubDate>Thu, 15 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/s/js2022/</guid>
+      <description>JavaScript is changing fast with a lot of new and exciting features to help us - developers write code better and better. These features have been released for a while. Let’s check them out!
+1. Private fields Previously, all class fields must be defined in the constructor. And there is no private fields. All fields can be accessed from outside. Of course, there are tricks with scope to make some variables inaccessible.</description>
+    </item>
+    
+  </channel>
+</rss>

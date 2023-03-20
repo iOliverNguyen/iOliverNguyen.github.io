@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Banner Game</title>
+  <script src="assets/pathseg.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #444;
+    }
+
+    body * {
+      box-sizing: border-box;
+    }
+
+    .header {
+      width: 100%;
+      height: 100px;
+    }
+
+    .box {
+      width: 1500px;
+      height: 500px;
+      margin: auto;
+      background-image: url(assets/bg.png);
+      position: relative;
+    }
+
+    #svg {
+      visibility: hidden;
+    }
+
+    .canvas {
+      width: 791px;
+      height: 500px;
+      position: absolute;
+      top: 0;
+      left: 394px;
+    }
+
+    .avatars {
+      z-index: 1;
+      position: absolute;
+      top: 10px;
+      left: 438px;
+      background-image: url(assets/avatars.png);
+      width: 702px;
+      height: 104px;
+    }
+
+    .avatar {
+      width: 102px;
+      height: 102px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      /*background-image: url(assets/avatarbg.png);*/
+    }
+
+    .avatar_user {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 100px;
+      height: 100px;
+      /*background-image: url(https://pbs.twimg.com/profile_images/1569878839916134401/pruvlEYw_200x200.jpg);*/
+      background-size: cover;
+      clip-path: circle(50%);
+    }
+
+    .scorepad {
+      width: 100px;
+      height: 31px;
+      position: absolute;
+      top: 80px;
+      left: 1px;
+      background-image: url(data:image/png;base64,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);
+    }
+
+    #avatar0 {
+      left: 0;
+    }
+
+    #avatar1 {
+      left: 120px;
+    }
+
+    #avatar2 {
+      left: 240px;
+    }
+
+    #avatar3 {
+      left: 360px;
+    }
+
+    #avatar4 {
+      left: 480px;
+    }
+
+    #avatar5 {
+      left: 600px;
+    }
+
+    .score, ._score {
+      position: absolute;
+      z-index: 2;
+      top: 92px;
+      color: #fff;
+      font-size: 24px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .score {
+      width: 100px;
+    }
+
+    ._score {
+      top: 10px;
+      width: 110px;
+      height: 100px;
+      cursor: pointer;
+    }
+
+    #score0, #_score0 {
+      left: 438px;
+    }
+
+    #score1, #_score1 {
+      left: 558px;
+    }
+
+    #score2, #_score2 {
+      left: 678px;
+    }
+
+    #score3, #_score3 {
+      left: 798px;
+    }
+
+    #score4, #_score4 {
+      left: 918px;
+    }
+
+    #score5, #_score5 {
+      left: 1038px;
+    }
+
+  </style>
+  <script type="module" crossorigin src="assets/main.ec082bbc.js"></script>
+</head>
+<body>
+<div id="box" class="box">
+  <canvas id="canvas" class="canvas"></canvas>
+  <div class="avatars">
+    <div id="avatar0" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+    <div id="avatar1" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+    <div id="avatar2" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+    <div id="avatar3" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+    <div id="avatar4" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+    <div id="avatar5" class="avatar">
+      <div class="avatar_user"></div>
+      <div class="scorepad"></div>
+    </div>
+  </div>
+  <div id="score0" class="score">0</div>
+  <div id="score1" class="score">0</div>
+  <div id="score2" class="score">0</div>
+  <div id="score3" class="score">0</div>
+  <div id="score4" class="score">0</div>
+  <div id="score5" class="score">0</div>
+
+  <div id="_score0" class="_score" onclick="addItem(0)"></div>
+  <div id="_score1" class="_score" onclick="addItem(1)"></div>
+  <div id="_score2" class="_score" onclick="addItem(2)"></div>
+  <div id="_score3" class="_score" onclick="addItem(3)"></div>
+  <div id="_score4" class="_score" onclick="addItem(4)"></div>
+  <div id="_score5" class="_score" onclick="addItem(5)"></div>
+</div>
+<svg id="svg">
+  <path id="path-heart"
+        d="M20.1,37.828 L20.072,37.828 C14.906,37.732 0,24.264 0,11.508 C0,5.38 5.05,0 10.806,0 C15.386,0 18.466,3.16 20.098,5.46 C21.726,3.164 24.806,8.8817842e-16 29.388,8.8817842e-16 C35.148,8.8817842e-16 40.196,5.38 40.196,11.51 C40.196,24.262 25.288,37.73 20.122,37.824 L20.1,37.824 L20.1,37.828 Z"></path>
+  <path id="path-retweet"
+        d="M47.517,23.541 C46.933,22.955 45.983,22.955 45.397,23.541 L40.957,27.981 L40.957,7.501 C40.957,3.365 37.591,0.001 33.457,0.001 L21.757,0.001 C20.929,0.001 20.257,0.673 20.257,1.501 C20.257,2.329 20.929,3.001 21.757,3.001 L33.457,3.001 C35.937,3.001 37.957,5.021 37.957,7.501 L37.957,27.981 L33.517,23.541 C32.931,22.955 31.981,22.955 31.397,23.541 C30.813,24.127 30.809,25.077 31.397,25.661 L38.397,32.661 C38.687,32.955 39.071,33.101 39.457,33.101 C39.843,33.101 40.223,32.957 40.517,32.661 L47.517,25.661 C48.105,25.077 48.105,24.127 47.517,23.541 Z M26.197,30.101 L14.497,30.101 C12.017,30.101 9.997,28.081 9.997,25.601 L9.997,5.121 L14.437,9.561 C14.733,9.855 15.117,10.001 15.501,10.001 C15.885,10.001 16.269,9.855 16.561,9.561 C17.147,8.975 17.147,8.025 16.561,7.441 L9.561,0.441 C8.975,-0.147 8.025,-0.147 7.441,0.441 L0.441,7.441 C-0.147,8.025 -0.147,8.975 0.441,9.561 C1.029,10.147 1.975,10.147 2.561,9.561 L7.001,5.121 L7.001,25.601 C7.001,29.737 10.367,33.101 14.501,33.101 L26.201,33.101 C27.029,33.101 27.701,32.429 27.701,31.601 C27.701,30.773 27.027,30.101 26.201,30.101 L26.197,30.101 Z"></path>
+</svg>
+<div id="result">
+  <!-- when done, will insert the div here -->
+  <!-- <div class="done"></div> -->
+</div>
+</body>
+</html>

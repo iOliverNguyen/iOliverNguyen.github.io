@@ -7,7 +7,57 @@
     
     <language>en-us</language>
     <copyright>Oliver Nguyen</copyright>
-    <lastBuildDate>Mon, 20 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 28 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitHub PRs on MacOS Menu Bar</title>
+      <link>https://iOliverNguyen.github.io/w/github.swiftbar/</link>
+      <pubDate>Thu, 28 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/github.swiftbar/</guid>
+      <description>I usually push a lot of PRs in form of stacked PRs to GitHub. It&amp;rsquo;s quite annoying to go through each PR to see the check status. So I created this plugin to show my PRs on the menu bar. — Now, everything is just a click away!
+Features 1. Top PRs section  List of your chosen PRs, sorted by your order. You can customize the list of PRs in this section by updating the file github.</description>
+    </item>
+    
+    <item>
+      <title>TIL: String type with a specific length in TypeScript</title>
+      <link>https://iOliverNguyen.github.io/w/microuuid/</link>
+      <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/microuuid/</guid>
+      <description>We&amp;rsquo;ll declare a Phantom Type:
+type StringN&amp;lt;N&amp;gt; = string &amp;amp; { length: N; readonly X: unique symbol; } const isStringN = &amp;lt;N extends number&amp;gt;(length: N, s: string): s is StringN&amp;lt;N&amp;gt; =&amp;gt; s.length == length; export const stringN = &amp;lt;N extends number&amp;gt;(length: N, s: string): StringN&amp;lt;N&amp;gt; =&amp;gt; { if (!isStringN(length, s)) throw new Error(`input must have length ${length}`); return s; } Then we can use it as below:
+export type MicroUuid = StringN&amp;lt;4&amp;gt;; export const microUuid = () =&amp;gt; stringN(4, newUuid().</description>
+    </item>
+    
+    <item>
+      <title>TIL: console.log with color</title>
+      <link>https://iOliverNguyen.github.io/w/logcolor/</link>
+      <pubDate>Tue, 15 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/logcolor/</guid>
+      <description>We can use this pattern to output log with color in browser by adding CSS:
+const logger = (name) =&amp;gt; ({ info: console.info.bind(console, `%c${name}: %s`, &amp;#39;color: #56d74b&amp;#39;), verbose: console.debug.bind(console, `%c${name}: %s`, &amp;#39;color: #70818e&amp;#39;), }) </description>
+    </item>
+    
+    <item>
+      <title>My work on the flow compiler for sending campaigns and auto reply</title>
+      <link>https://iOliverNguyen.github.io/w/flow.compiler/</link>
+      <pubDate>Thu, 10 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/flow.compiler/</guid>
+      <description>At work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors. The use cases are to provide our users the ability to automatically response to their customers&#39; messages. Users can define their own flow and customize auto reply behaviours. This article gives a look into my work. Also see related article.
+ Package flow implements the flow document compiler and runtime controller. The compiler is responsible for parsing the flow document and compiling it into a specific format for that flow document type, and can be executed by a runtime engine.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Auto-reload a command when files changed using entr</title>
+      <link>https://iOliverNguyen.github.io/w/entr/</link>
+      <pubDate>Mon, 15 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/entr/</guid>
+      <description>While working with Go and JavaScript, we have tools available for auto reloading the server when the code changes. For JavaScript, we even have hot reload which reloads part of the page without reloading the whole page. But for Python, we don&amp;rsquo;t have such tools, I tried livereload, but it does not work well for nested directories. So I decided to do it myself. And there is a tool called entr which helps run a command when some file changes.</description>
+    </item>
+    
     <item>
       <title>Pull data from HackerNews API and dump to JSON files</title>
       <link>https://iOliverNguyen.github.io/w/hackernews/</link>
@@ -16,7 +66,7 @@
       <guid>https://iOliverNguyen.github.io/w/hackernews/</guid>
       <description>I wrote a simple script to download the HackerNews data from HackerNews API. It downloads the data in JSON format and stores it as a collection of files. The first time it runs, it will create the directory data to store the data. Subsequent runs will update the data in the directory.
 At the time of this writing, the HackerNew database has about 35 million items.
-Usage cd hackernews direnv allow go run .</description>
+Usage git clone https://github.com/iOliverNguyen/hackernews-dump cd hackernews direnv allow go run .</description>
     </item>
     
     <item>
@@ -25,8 +75,8 @@ Usage cd hackernews direnv allow go run .</description>
       <pubDate>Wed, 15 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://iOliverNguyen.github.io/w/flow.doc/</guid>
-      <description>At my work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors.
-Flow documents are a collection of nodes and edges, which are JSON objects. They are used to describe the flow of an automation chatbot. The flow compiler takes a flow document and compile it into an ETA flow descriptor, that is used by the ETA engine to run the flow. ETA is short for &amp;ldquo;Event-Action-Trigger&amp;rdquo;, a programming paradigm that is used to describe how to react (&amp;ldquo;action&amp;rdquo;) with each event matching a specific condition (&amp;ldquo;trigger&amp;rdquo;).</description>
+      <description>At work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors. You can read more details in this article.
+Flow documents are a collection of nodes and edges, which are JSON objects. They are used to describe the flow of an automation chatbot. The flow compiler takes a flow document and compile it into an ETA flow descriptor, that is used by the ETA engine to run the flow.</description>
     </item>
     
     <item>
@@ -35,11 +85,12 @@ Flow documents are a collection of nodes and edges, which are JSON objects. They
       <pubDate>Sun, 19 Feb 2023 00:00:00 +0000</pubDate>
       
       <guid>https://iOliverNguyen.github.io/w/stacked.prs/</guid>
-      <description>I usually work with stacked PRs. It is a great way to organize my work. I was using sapling and it works really well. I can view stacked commits with sl smart logs, edit many files and make changes to many commits at the same time with sl absorb, have the stack automatically rebase after each change, and push these commits as multiple stacked GitHub PRs with a single sl pr command.</description>
+      <description>I usually work with stacked PRs. It is a great way to organize my work and keep my commits small. This empowers separation of concern and limit scope of each PR. Reviewers can go through each PR and review them one by one. Smaller changes, better feedback!
+ I was using sapling. It worked really well in the first month, but the honeymoon ended too soon. Read more... Using sapling, I can view stacked commits with sl smart logs, edit many files and make changes to many commits at the same time with sl absorb, have the stack automatically rebase after each change, and push these commits as multiple stacked GitHub PRs with a single sl pr command.</description>
     </item>
     
     <item>
-      <title>Where does Github CLI store its credentials?</title>
+      <title>TIL: Where does Github CLI store its credentials?</title>
       <link>https://iOliverNguyen.github.io/w/github.cli/</link>
       <pubDate>Sat, 07 Jan 2023 00:00:00 +0000</pubDate>
       

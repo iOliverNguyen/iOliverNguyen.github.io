@@ -80,6 +80,18 @@ a.no-underline:not(:hover) {
   }
 }
 
+/* utilities */
+
+.more {
+  cursor: pointer;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* article */
+
 article .content h2,
 article .content h3,
 article .content h4,

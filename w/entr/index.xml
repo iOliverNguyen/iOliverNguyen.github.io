@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TIL: Auto-reload a command when files changed using entr on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/entr/</link>
+    <description>Recent content in TIL: Auto-reload a command when files changed using entr on Oliver Nguyen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Mon, 15 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/entr/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

@@ -1,0 +1,341 @@
+<!doctype html><html lang="en-us"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script | Oliver Nguyen</title><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="all,follow"><meta name="googlebot" content="index,follow,snippet,archive"><meta name="og:site_name" content="Oliver Nguyen"><meta property="og:title" content="Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script"><meta property="og:description" content="In JavaScript/Node world, we usually store scripts in package.json and run them using npm. In other worlds, we use Makefile or create a directory and put all our scripts there. But there is a better way to manage and run scripts for your team. No, I&rsquo;m not talking about Warp or other pricey fancy tools.
+I will share about direnv and our old friend bash: How we are using them to effectively write and manage scripts as a team."><meta property="og:type" content="article"><meta property="og:url" content="https://iOliverNguyen.github.io/w/direnv.run/"><meta property="og:image" content="https://iOliverNguyen.github.io/images/ogx.png"><meta property="article:section" content="w"><meta property="article:published_time" content="2024-07-24T00:00:00+00:00"><meta property="article:modified_time" content="2024-07-24T00:00:00+00:00"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://iOliverNguyen.github.io/images/ogx.png"><meta name="twitter:title" content="Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script"><meta name="twitter:description" content="In JavaScript/Node world, we usually store scripts in package.json and run them using npm. In other worlds, we use Makefile or create a directory and put all our scripts there. But there is a better way to manage and run scripts for your team. No, I&rsquo;m not talking about Warp or other pricey fancy tools.
+I will share about direnv and our old friend bash: How we are using them to effectively write and manage scripts as a team."><link rel="stylesheet" href="https://iOliverNguyen.github.io/css/style-classic.css"><link rel="stylesheet" href="https://iOliverNguyen.github.io/style.css"><link rel="icon" type="image/png" href="/images/favicon.png"><link href="https://iOliverNguyen.github.io/w/direnv.run/index.xml" rel="alternate" type="application/rss+xml" title="Oliver Nguyen"><script async src="https://www.googletagmanager.com/gtag/js?id=G-L5X8RJDCLM"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-L5X8RJDCLM")</script><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></head><body class="max-width mx-auto px3 ltr"><div class="content index py4"><article class="post" itemscope itemtype="http://schema.org/BlogPosting"><header><h1 class="posttitle" itemprop="name headline">Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script</h1><div class="meta"><div class="postdate"><time datetime="2024-07-24 00:00:00 &#43;0000 UTC" itemprop="datePublished">2024-07-24</time></div><div class="article-tag">&nbsp;· <a class="tag-link" href="/w/#cli" rel="tag">cli</a></div><div class="published-at">published at <a target="_blank" href="https://blog.connectly.ai/upgrade-your-scripts-using-direnv-and-run-script-baccb31400fa">Connectly.ai</a></div></div></header><div class="content" itemprop="articleBody"><p><em>In JavaScript/Node world, we usually store scripts in package.json and run them using npm. In other worlds, we use Makefile or create a directory and put all our scripts there. But there is a better way to manage and run scripts for your team. No, I&rsquo;m not talking about <a href="https://docs.warp.dev/features/warp-drive">Warp</a> or other <del>pricey</del> fancy tools.</em></p><p><em><strong>I will share about <a href="https://direnv.net/">direnv</a> and our old friend <code>bash</code>: How we are using them to effectively write and manage scripts as a team.</strong></em></p><h2 id="direnv-automatically-set-environment-variables-base-on-the-current-directory">direnv: Automatically set environment variables base on the current directory</h2><p>For a <del>boring</del> quick introduction, <a href="https://direnv.net/">direnv</a> is an environment switcher for the shell. You can define environment variables in a <code>.envrc</code> file within a directory, and these variables are automatically applied when you cd into that directory. When you leave the directory, the environment variables are unloaded, ensuring that your environment stays clean and consistent.</p><p>You can quickly <a href="https://direnv.net/docs/installation.html">install it</a> from your favorite package manager and <a href="https://direnv.net/docs/hook.html">add a line</a> to your shell profile. Then you can create a <code>.envrc</code> and put any <code>export</code> or commands into it. <em>Yes, any commands</em>. They will be <em>automatically executed</em> when you enter the directory. <em>No, don&rsquo;t worry, it won&rsquo;t run arbitrary code from theh internet.</em> You must explicitly allow it by entering <code>direnv allow</code> — every time the content changes.</p><p><strong><em>That&rsquo;s enough for an introduction. Now, let&rsquo;s come to the fun part: How do we use it in practice?</em></strong></p><h3 id="setup-common-environment-variables-for-the-project">Setup common environment variables for the project</h3><p>At the root of our project, we have a <code>.envrc</code> file that sets up the environment for our project. The first use case is to declare common variables for use in scripts:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># .envrc</span>
+<span class="nb">export</span>  <span class="nv">PROJECT_ROOT</span><span class="o">=</span><span class="k">$(</span>git rev-parse --show-toplevel 2&gt;/dev/null<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">RELATIVE_PATH</span><span class="o">=</span><span class="k">$(</span>git rev-parse --show-prefix   2&gt;/dev/null<span class="k">)</span>
+</code></pre></div><p>While the code looks simple, it serves a very important purpose: When writing scripts, we know that these variables are always available. The project root, and the relative path to the current directory. Now we can use them wherever we want:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># run script (more on it later)</span>
+run-clean<span class="o">()</span> <span class="o">{</span>
+    rm -r <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/js/node_modules&#34;</span>
+    rm -r <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.logs&#34;</span>
+<span class="o">}</span>
+run-test<span class="o">()</span> <span class="o">{</span>
+    bash -c <span class="s2">&#34;cd </span><span class="nv">$PROJECT_ROOT</span><span class="s2">/go  &amp;&amp; go test ./...&#34;</span>
+    bash -c <span class="s2">&#34;cd </span><span class="nv">$PROJECT_ROOT</span><span class="s2">/idl &amp;&amp; go test ./...&#34;</span>
+<span class="o">}</span>
+run-in-docker<span class="o">()</span> <span class="o">{</span>
+    docker run -v <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">:/root/src&#34;</span>  <span class="se">\
+</span><span class="se"></span>               -w <span class="s2">&#34;/root/src/</span><span class="nv">$RELATIVE_PATH</span><span class="s2">&#34;</span> <span class="se">\
+</span><span class="se"></span>                  <span class="s2">&#34;</span><span class="nv">$DOCKER_IMAGE</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+</code></pre></div><h3 id="automatically-make-all-scripts-in-a-directory-available">Automatically make all scripts in a directory available</h3><p>Let&rsquo;s assume that our project has this structure:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">backend/
+├── .bin/
+├── idl/
+├── js/
+├── go/
+├── scripts/ 
+│   ├── _cli.sh
+│   └── build-all.sh
+├── .envrc
+└── run    
+</code></pre></div><p>When we are working at a subdirectory, we may want to run <code>build-all.sh</code> from the <code>scripts</code> directory. Without <code>direnv</code>, we can run it by specifying the full path to the script <code>~/Users/i/ws/backend/scripts/build-all.sh</code> or by <code>../../../scripts/build-all.sh</code>. Thank to <code>direnv</code>, we can make all scripts in the <code>scripts</code> directory always available by using <a href="https://direnv.net/man/direnv-stdlib.1.html#codepathadd-ltpathgtcode">PATH_add</a>:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># &#39;PATH_add&#39; and &#39;path_add&#39; are different commands</span>
+PATH_add <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/scripts&#34;</span>
+</code></pre></div><p>Now we can run <code>build-all.sh</code> from any directory in the project! So convenient! Even better, we can put all your scripts into <code>run</code> script at the root of the project, and add this line to the <code>.envrc</code> file:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">PATH_add <span class="s2">&#34;</span><span class="nv">$PWD</span><span class="s2">&#34;</span>
+</code></pre></div><p>Next time, simply <code>run build-all</code> from anywhere. More on that <a href="#run">later</a>.</p><h3 id="different-configurations-for-different-directories">Different configurations for different directories</h3><p>When inside a directory, <code>direnv</code> will look for <code>.envrc</code> file in that directory and execute it. If the directory does not have <code>.envrc</code> file, <code>direnv</code> will travel up the tree until it finds one. This allows us to have different configurations for different subprojects. Like these:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># go/.envrc</span>
+<span class="nb">export</span> <span class="nv">DOCKER_IMAGE</span><span class="o">=</span>golang:1.22
+<span class="nb">export</span> <span class="nv">CONTAINER_NAME</span><span class="o">=</span>my-go-dev
+</code></pre></div><p>And in the <code>js</code> directory:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># js/.envrc</span>
+<span class="nb">export</span> <span class="nv">DOCKER_IMAGE</span><span class="o">=</span>node:22-alpine
+<span class="nb">export</span> <span class="nv">CONTAINER_NAME</span><span class="o">=</span>my-js-dev
+</code></pre></div><p>So when we <code>run docker</code> from any directory, it will use the correct Docker image and configs.</p><h3 id="verify-that-all-developers-use-the-same-tools-and-versions">Verify that all developers use the same tools and versions</h3><p>Remember that we can put any commands into the <code>.envrc</code> file? We can use this to ensure that all developers use the same tools and versions. For example, we can check that the correct version of Go is installed:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># .envrc</span>
+<span class="k">if</span> ! <span class="nb">command</span> -v go <span class="p">&amp;</span>&gt; /dev/null<span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&#34;Go is not installed. Please install Go 1.22 👉 https://golang.org/dl&#34;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+<span class="k">if</span> ! go version <span class="p">|</span> grep -q <span class="s2">&#34;go1.22&#34;</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&#34;Go 1.22 is required. Please install Go 1.22 👉 https://golang.org/dl&#34;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>    
+</code></pre></div><p>We can put similar checks for other tools like Node, Docker, or any other tools that your project uses. This ensures that all developers use the same tools and versions, which can prevent many issues.</p><p><strong>Tip</strong>: Put the above checks in <code>go/.envrc</code> so only developers working on the Go part of the project need to have Go. We don&rsquo;t want to force front-end developers to install Go, do we?</p><h3 id="include-parent-envrc-file">Include parent <code>.envrc</code> file</h3><p>When we have a large project with multiple directories, and we have to copy (&amp; maintain) those <code>.envrc</code> files to each directory, it&rsquo;s time to refactor! Instead of copying, we can include the parent <code>.envrc</code> file. This is very useful since we can organize our configs with inheritance and overrides: A single source of truth for shared configurations while allowing specific directories to override or extend these settings as needed.</p><p>Let&rsquo;s use the <code>source</code> command to include the parent <code>.envrc</code> file:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">find-parent<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">local</span> <span class="nv">dir</span><span class="o">=</span>..
+    <span class="k">while</span> <span class="o">[[</span> -d <span class="s2">&#34;</span><span class="nv">$dir</span><span class="s2">&#34;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> ! -d <span class="s2">&#34;</span><span class="nv">$dir</span><span class="s2">/.git&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">do</span>
+        <span class="nv">dir</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">dir</span><span class="si">}</span><span class="s2">/..&#34;</span> <span class="p">;</span>
+    <span class="k">done</span>
+    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$dir</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+parent-envrc<span class="o">=</span><span class="k">$(</span>find-parent<span class="k">)</span>/.envrc
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&#34;</span><span class="nv">$parent</span><span class="s2">-envrc&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&#34;no parent .envrc found&#34;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># shellcheck source=/dev/null</span>
+<span class="nb">source</span> <span class="s2">&#34;</span><span class="nv">$parent</span><span class="s2">-envrc&#34;</span>
+
+<span class="c1"># we can override variables if needed</span>
+<span class="nb">export</span> <span class="nv">DOCKER_IMAGE</span><span class="o">=</span>golang:1.22
+</code></pre></div><p><strong><em>There are <a href="https://github.com/direnv/direnv/wiki">many other use cases</a> for <code>direnv</code> if you want to explore more. Now, let&rsquo;s move on to the <code>run</code> script.</em></strong></p><hr><div id="run"></div><h2 id="run-a-simple-bash-script-to-manage-all-scripts-in-a-project">run: A simple bash script to manage all scripts in a project</h2><p>It&rsquo;s not an actual tool for you to install, but a pattern for managing and executing scripts. We create a file with name <code>run</code> at the same directory with <code>.envrc</code> and put our scripts there. This file is a collection of functions that we can run from the command line. It&rsquo;s like a Makefile, but written in bash.</p><h3 id="an-example">An example</h3><p><em>A <del>picture</del> code is worth a thousand words.</em> Here is an example of <code>run</code> script that we use in our project:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -eo pipefail
+
+run-calc<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">result</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">|</span> bc -l<span class="k">)</span>
+    <span class="k">if</span> <span class="o">[[</span> <span class="s2">&#34;</span><span class="nv">$JSON</span><span class="s2">&#34;</span> <span class="o">==</span> <span class="s2">&#34;1&#34;</span> <span class="o">]]</span> <span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s1">&#39;{&#34;result&#34;: &#34;&#39;</span><span class="nv">$result</span><span class="s1">&#39;&#34;}&#39;</span>
+    <span class="k">else</span>
+        <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$result</span><span class="s2">&#34;</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+run-colors<span class="o">()</span> <span class="o">{</span>
+    color<span class="o">(){</span>
+        <span class="k">for</span> c<span class="p">;</span> <span class="k">do</span>
+            <span class="nb">printf</span> <span class="s1">&#39;\e[48;5;%dm %03d &#39;</span> <span class="nv">$c</span> <span class="nv">$c</span>
+        <span class="k">done</span>
+        <span class="nb">printf</span> <span class="s1">&#39;\e[0m \n&#39;</span>
+    <span class="o">}</span>
+
+    <span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39; \t\n&#39;</span>
+    color <span class="o">{</span>0..15<span class="o">}</span>
+    <span class="k">for</span> <span class="o">((</span><span class="nv">i</span><span class="o">=</span>0<span class="p">;</span>i&lt;6<span class="p">;</span>i++<span class="o">))</span><span class="p">;</span> <span class="k">do</span>
+        color <span class="k">$(</span>seq <span class="k">$((</span>i*36+16<span class="k">))</span> <span class="k">$((</span>i*36+51<span class="k">)))</span>
+    <span class="k">done</span>
+    color <span class="o">{</span>232..255<span class="o">}</span>
+<span class="o">}</span>
+run-update-submodules<span class="o">()</span> <span class="o">{</span>
+    git submodule update --init --recursive --remote
+<span class="o">}</span>
+run-direnv-allow-all<span class="o">()</span> <span class="o">{</span>
+    find . -name .envrc -exec bash -lc <span class="se">\
+</span><span class="se"></span>        <span class="s1">&#39;cd &#34;$(dirname &#34;{}&#34;)&#34; &amp;&amp; pwd &amp;&amp; direnv allow&#39;</span> <span class="se">\;</span>
+<span class="o">}</span>
+run-generate-all<span class="o">()</span> <span class="o">{</span>
+    bash -c <span class="s2">&#34;cd </span><span class="nv">$PROJECT_ROOT</span><span class="s2">/go  &amp;&amp; go generate ./...&#34;</span>
+    direnv <span class="nb">exec</span> <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/idl&#34;</span>  run generate
+    <span class="nv">RELATIVE_PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/idl&#34;</span> run-in-docker buf generate
+<span class="o">}</span>
+run-in-docker<span class="o">()</span> <span class="o">{</span>
+    docker run -v <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">:/root/src&#34;</span>  <span class="se">\
+</span><span class="se"></span>               -w <span class="s2">&#34;/root/src/</span><span class="nv">$RELATIVE_PATH</span><span class="s2">&#34;</span> <span class="se">\
+</span><span class="se"></span>               <span class="s2">&#34;</span><span class="nv">$DOCKER_IMAGE</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+<span class="c1"># -------- this is the magic ------- #</span>
+<span class="nb">source</span> <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/scripts/_cli.sh&#34;</span>
+</code></pre></div><p>Save that script as <code>run</code> in the same directory with <code>.envrc</code>. On its own, the <code>run</code> script does not do anything. It&rsquo;s just a collection of functions. The magic happens at the last line when it <code>source</code> the <code>_cli.sh</code> script.</p><h3 id="_clish-make-all-functions-from-the-run-script-available">_cli.sh: make all functions from the <code>run</code> script available</h3><p>So what does <code>_cli.sh</code> do? Its job is to detect all available functions in the <code>run</code> script and allow you to run them from the terminal. Here is the content of <code>_cli.sh</code>:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -eo pipefail
+
+show-help<span class="o">(){</span>
+    <span class="nv">items</span><span class="o">=()</span>
+    <span class="k">while</span> <span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="nb">read</span> -r line<span class="p">;</span> <span class="k">do</span> <span class="nv">items</span><span class="o">+=(</span><span class="s2">&#34;</span><span class="nv">$line</span><span class="s2">&#34;</span><span class="o">)</span><span class="p">;</span> <span class="k">done</span> &lt; <span class="se">\
+</span><span class="se"></span>        &lt;<span class="o">(</span><span class="nb">compgen</span> -A <span class="s2">&#34;function&#34;</span> <span class="p">|</span> grep <span class="s2">&#34;run-&#34;</span> <span class="p">|</span> sed <span class="s2">&#34;s/run-//&#34;</span><span class="o">)</span>
+    <span class="nb">printf</span> -v items <span class="s2">&#34;\t%s\n&#34;</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">items</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&#34;</span>
+
+    <span class="nv">usage</span><span class="o">=</span><span class="s2">&#34;USAGE: </span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$0</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2"> CMD [ARGUMENTS]
+</span><span class="s2">  CMD:\n</span><span class="nv">$items</span><span class="s2">&#34;</span>
+    <span class="nb">printf</span> <span class="s2">&#34;</span><span class="nv">$usage</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+<span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="k">case</span> <span class="s2">&#34;</span><span class="nv">$name</span><span class="s2">&#34;</span> in
+    <span class="s2">&#34;&#34;</span> <span class="p">|</span> <span class="s2">&#34;-h&#34;</span> <span class="p">|</span> <span class="s2">&#34;--help&#34;</span> <span class="p">|</span> <span class="s2">&#34;help&#34;</span><span class="o">)</span>
+        show-help
+        <span class="p">;;</span>
+    *<span class="o">)</span>
+        <span class="nb">shift</span>
+        <span class="k">if</span> <span class="nb">compgen</span> -A <span class="s2">&#34;function&#34;</span> <span class="p">|</span> grep <span class="s2">&#34;run-</span><span class="nv">$name</span><span class="s2">&#34;</span> &gt;/dev/null <span class="p">;</span> <span class="k">then</span>
+            run-<span class="s2">&#34;</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+        <span class="k">else</span>
+            <span class="nb">echo</span> <span class="s2">&#34;ERROR: run-</span><span class="nv">$name</span><span class="s2"> not found.&#34;</span>
+            <span class="nb">exit</span> <span class="m">123</span>
+        <span class="k">fi</span>
+        <span class="p">;;</span>
+<span class="k">esac</span>
+</code></pre></div><p><strong>Let&rsquo;s try it:</strong></p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">$ run
+USAGE: run CMD [ARGUMENTS]
+  CMD:
+        calc
+        colors
+        direnv-allow-all
+        generate-all
+        in-docker
+        update-submodules
+</code></pre></div><p>Nice! It shows all available commands, sorted by name.<br>Let&rsquo;s run a command:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">$ run colors
+</code></pre></div><p><img src="colors.png" alt="colors"></p><p>Beautiful! It outputs all colors in 256-color mode together with their codes.<br>And what happens if a command does not exist?</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">$ run x
+ERROR: run-x not found.
+
+$ <span class="nb">echo</span> <span class="nv">$?</span>
+<span class="m">123</span>
+</code></pre></div><p>Oh! It shows an error with exit code.<br>Can we pass arguments and variables too?</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">$ run calc <span class="m">2</span> ^ <span class="m">16</span>
+<span class="m">65536</span>
+
+$ <span class="nv">JSON</span><span class="o">=</span><span class="m">1</span> run calc <span class="s1">&#39;6 * 7&#39;</span>
+<span class="o">{</span><span class="s2">&#34;result&#34;</span>: <span class="s2">&#34;42&#34;</span><span class="o">}</span>
+</code></pre></div><p>Perfect! Now we are ready to add more scripts to <code>run</code>! 🚀🚀</p><h3 id="explanation-how-does-it-work">Explanation: How does it work?</h3><ul><li>The <code>run</code> script declares functions that we want to run. These functions start with <code>run-</code> prefix.</li><li>The <code>_cli.sh</code> script detects all available functions in the <code>run</code> script by calling <code>compgen -A &quot;function&quot;</code>.</li><li><a href="https://tiswww.case.edu/php/chet/bash/bashref.html#index-completion-builtins">compgen</a> is a bash built-in command that generates possible completions for a command.</li><li>We pipe <code>compgen</code> output through <code>grep</code> and <code>sed</code> to get all functions that start with <code>run-</code> prefix, then save them into <code>items</code>. This is the list of available commands. We can then list them in <code>run help</code>.</li><li>To run a command, we check if the function exists by calling <code>compgen</code> again. If it exists, we call it with the provided arguments. If not, we show an error message and exit with code 123.</li></ul><p><strong>Direnv and run are a powerful combination:</strong></p><ul><li>Without <code>direnv</code>, we need to use <code>./run colors</code> to call the <code>colors</code> command. If we are in a subdirectory, it becomes <code>../../../run colors</code>.</li><li>Thanks to <code>direnv</code>, we can use <code>PATH_add &quot;$PWD&quot;</code> in <code>.envrc</code> and enjoy calling <code>run colors</code> from any subdirectory.</li><li>The <code>run-in-docker</code> function is a good example of how we can use <code>direnv</code> and <code>run</code> together. It uses the <code>RELATIVE_PATH</code> and <code>DOCKER_IMAGE</code> variables from the <code>.envrc</code> file to run a command in a Docker container.<ul><li><em>Remember that we can declare those variables in different <code>.envrc</code> files for different directories?</em></li></ul></li><li>The <code>run-generate-all</code> function demonstrates using <code>direnv exec</code> and manually set <code>RELATIVE_PATH</code> to run the command in other directories.</li></ul><hr><h2 id="using-direnv-and-run-in-practice">Using <code>direnv</code> and <code>run</code> in practice</h2><h3 id="predefine-utilities-and-make-them-always-available-for-scripts">Predefine utilities and make them always available for scripts</h3><p>For example, let&rsquo;s define a few functions for coloring text in the <code>_cli.sh</code> script:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># _cli.sh</span>
+
+<span class="c1"># t is text</span>
+t-color<span class="o">()</span>  <span class="o">{</span> <span class="nb">printf</span> <span class="s2">&#34;\e[38;5;%dm&#34;</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+t-yellow<span class="o">()</span> <span class="o">{</span> t-color <span class="m">3</span> <span class="p">;</span> <span class="o">}</span>
+t-reset<span class="o">()</span>  <span class="o">{</span> <span class="nb">printf</span> <span class="s2">&#34;\e[0m&#34;</span> <span class="p">;</span> <span class="o">}</span>
+
+<span class="c1"># p is printf</span>
+p-color<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">local</span> <span class="nv">color</span><span class="o">=</span><span class="nv">$1</span> <span class="p">;</span> <span class="nb">shift</span>
+    <span class="nb">printf</span> <span class="s2">&#34;\e[38;5;%dm&#34;</span> <span class="s2">&#34;</span><span class="nv">$color</span><span class="s2">&#34;</span>
+    <span class="nb">printf</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+    <span class="nb">printf</span> <span class="s2">&#34;\e[0m&#34;</span>
+<span class="o">}</span>
+p-red<span class="o">()</span>    <span class="o">{</span> p-color   <span class="m">9</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-green<span class="o">()</span>  <span class="o">{</span> p-color   <span class="m">2</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-blue<span class="o">()</span>   <span class="o">{</span> p-color   <span class="m">4</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-yellow<span class="o">()</span> <span class="o">{</span> p-color   <span class="m">3</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-purple<span class="o">()</span> <span class="o">{</span> p-color <span class="m">213</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span> <span class="p">;</span> <span class="o">}</span>
+
+p-debug<span class="o">()</span>  <span class="o">{</span> p-purple <span class="s2">&#34;DEBUG: </span><span class="nv">$@</span><span class="s2">\n&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-info<span class="o">()</span>   <span class="o">{</span> p-blue   <span class="s2">&#34; INFO: </span><span class="nv">$@</span><span class="s2">\n&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-warn<span class="o">()</span>   <span class="o">{</span> p-yellow <span class="s2">&#34; WARN: </span><span class="nv">$@</span><span class="s2">\n&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-error<span class="o">()</span>  <span class="o">{</span> p-red    <span class="s2">&#34;ERROR: </span><span class="nv">$@</span><span class="s2">\n&#34;</span> <span class="p">;</span> <span class="o">}</span>
+p-success<span class="o">(){</span> p-green <span class="s2">&#34;✅  OK: </span><span class="nv">$@</span><span class="s2">\n&#34;</span> <span class="p">;</span> <span class="o">}</span>
+</code></pre></div><p>Then we can use them in our scripts:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># run</span>
+
+run-test<span class="o">()</span> <span class="o">{</span>
+    p-info <span class="s2">&#34;Running tests...&#34;</span>
+    <span class="k">if</span> go <span class="nb">test</span> ./... <span class="p">;</span> <span class="k">then</span>
+        p-success <span class="s2">&#34;All tests passed.&#34;</span>
+    <span class="k">else</span>
+        p-error <span class="s2">&#34;Some tests failed.&#34;</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+</code></pre></div><h3 id="require-developers-to-use-the-same-tools-and-versions">Require developers to use the same tools and versions</h3><p>This is a real-world example of how we can enforce developers to use the same Go versions. We put this check inside <code>_cli.sh</code>, so everytime a developer runs a command, it will check if the correct version of Go is installed:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># _cli.sh</span>
+
+<span class="k">if</span> <span class="o">[[</span> -e <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/go&#34;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">&#34;</span> !<span class="o">=</span> <span class="s2">&#34;/root/&#34;</span>* <span class="o">]]</span> <span class="p">;</span> <span class="k">then</span>
+    <span class="k">if</span> ! which go &gt;/dev/null 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+        p-error <span class="s2">&#34;         🔥  go is not installed  🔥&#34;</span>
+        p-info  <span class="s2">&#34;-----------------------------------------------&#34;</span>
+        p-info  <span class="s2">&#34; 👉 HINT: download at https://golang.org/dl 👈 &#34;</span>
+        p-info  <span class="s2">&#34;-----------------------------------------------&#34;</span>
+        <span class="nb">exit</span> <span class="m">1</span>
+    <span class="k">fi</span>
+    <span class="k">if</span> ! go version <span class="p">|</span> grep -q <span class="s2">&#34;go1.22&#34;</span> <span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+        p-error <span class="s2">&#34;       🔥  go version is not 1.22  🔥&#34;</span>
+        p-info  <span class="s2">&#34;-----------------------------------------------&#34;</span>
+        p-info  <span class="s2">&#34; 👉 HINT: download at https://golang.org/dl 👈 &#34;</span>
+        p-info  <span class="s2">&#34;-----------------------------------------------&#34;</span>
+        <span class="nb">exit</span> <span class="m">1</span>
+    <span class="k">fi</span>
+<span class="k">fi</span>
+</code></pre></div><ul><li>The check <code>[[ -e &quot;$PROJECT_ROOT/go&quot; ]]</code> to make Go only a requirement for developers who work with Go.</li><li>The check <code>[[ &quot;$PROJECT_ROOT&quot; != &quot;/root/&quot;* ]]</code> to prevent the check from running in Docker containers.</li></ul><h3 id="automatically-keep-submodules-up-to-date">Automatically keep submodules up-to-date</h3><p>Many times, developers forgot to update submodules, which led to issues when running scripts that depend on them. It may cost them hours to debug or to ask questions then wait for answers hours later, just to find out that they forgot to update submodules. 😮‍💨</p><p>We can add a check to <code>_cli.sh</code> to remind them to update submodules when necessary:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># _cli.sh</span>
+
+<span class="k">if</span> git status <span class="p">|</span> grep -Eq <span class="s2">&#34;\smodified:[^\n]+tooling \(new commits\)&#34;</span> <span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+    p-yellow <span class="s2">&#34; 🔥 Your tooling submodule is out of date. 🔥&#34;</span>
+    p-yellow <span class="s2">&#34;-----------------------------------------------&#34;</span>
+    <span class="k">if</span> ask-yes-no <span class="s2">&#34;👉 Do you want to update submodules? 👈&#34;</span> <span class="p">;</span> <span class="k">then</span>
+        git submodule update --init --recursive --remote
+    <span class="k">fi</span>
+<span class="k">fi</span>
+</code></pre></div><ul><li>If <code>git status</code> outputs <code>modified: tooling (new commits)</code>, it means the submodule is out of date. The script will ask the developer before processing to update submodules.</li><li>It only checks for <code>(new commits)</code>, so any other changes like <code>untracked content</code> or <code>(new commits, modified content)</code> in the submodule will not trigger the warning.</li></ul><p>The <code>ask-yes-no</code> is a simple function to ask the developer for confirmation:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># _cli.sh</span>
+
+ask-yes-no<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+    <span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
+        t-yellow      
+        <span class="nb">read</span> -p <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2"> [y/n]: &#34;</span> yn
+        <span class="k">case</span> <span class="nv">$yn</span> in
+            <span class="o">[</span>Yy<span class="o">]</span>* <span class="o">)</span> <span class="k">return</span> 0<span class="p">;;</span>  <span class="c1"># Yes</span>
+            <span class="o">[</span>Nn<span class="o">]</span>* <span class="o">)</span> <span class="k">return</span> 1<span class="p">;;</span>  <span class="c1"># No</span>
+            * <span class="o">)</span> p-warn <span class="s2">&#34;Please answer yes or no? 🔥&#34;</span><span class="p">;;</span>
+        <span class="k">esac</span>
+    <span class="k">done</span>
+<span class="o">}</span>
+</code></pre></div><h3 id="automatically-setup-local-environment">Automatically setup local environment</h3><p>Similarly, we can check if <code>jq</code> is installed. If not, we can install <code>gojq</code> and create an alias to <code>jq</code> in the <code>.bin</code> directory.<br>Note that we need to use <code>PATH_add &quot;$PROJECT_ROOT/.bin&quot;</code> in the <code>.envrc</code> file to make the <code>jq</code> command available.</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># _cli.sh</span>
+
+<span class="k">if</span> ! which jq <span class="p">&amp;</span>&gt;/dev/null <span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&#34;&#34;</span>
+    p-yellow <span class="s2">&#34; 🔥 You do not have jq installed. 🔥&#34;</span>
+    p-yellow <span class="s2">&#34;-----------------------------------------------&#34;</span>
+    <span class="k">if</span> ask-yes-no <span class="s2">&#34;👉 Do you want to automatically install gojq? 👈&#34;</span> <span class="p">;</span> <span class="k">then</span>
+        p-info <span class="s2">&#34;installing gojq...&#34;</span>
+        bash -c <span class="s1">&#39;cd ~ ; go install github.com/itchyny/gojq/cmd/gojq@latest&#39;</span>
+        <span class="k">if</span> ! which gojq <span class="p">&amp;</span>&gt;/dev/null <span class="p">;</span> <span class="k">then</span>
+            p-error <span class="s2">&#34;Failed to install gojq. Please install jq or gojq manually.&#34;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+        <span class="k">fi</span>
+        mkdir -p <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin&#34;</span>
+        <span class="nb">echo</span> <span class="s1">&#39;#!/bin/bash
+</span><span class="s1">set -eo pipefail
+</span><span class="s1">gojq &#34;$@&#34;&#39;</span> &gt; <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/jq&#34;</span>
+        chmod +x <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/jq&#34;</span>
+    <span class="k">fi</span>
+<span class="k">fi</span>
+</code></pre></div><h3 id="load-sensitive-secrets">Load sensitive secrets</h3><p>Some commands require sensitive secrets to run. We can create a utility function to load those secrets from AWS Secrets Manager and use them later in other scripts:</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">run-login<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">api_key</span><span class="o">=</span><span class="k">$(</span><span class="nv">$awscli</span> secretsmanager get-secret-value --secret-id <span class="s1">&#39;my-secret-id&#39;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.SecretString&#39;</span> <span class="p">|</span> jq -r <span class="s2">&#34;.MY_API_KEY&#34;</span><span class="k">)</span>
+    <span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&#34;</span><span class="nv">$api_key</span><span class="s2">&#34;</span> <span class="o">]]</span> <span class="p">;</span> <span class="k">then</span> p-error <span class="s2">&#34;MY_API_KEY not found&#34;</span> <span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span> <span class="p">;</span> <span class="k">fi</span>
+
+    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$api_key</span><span class="s2">&#34;</span> <span class="p">|</span> run-in-docker ./scripts/login.sh
+<span class="o">}</span>
+run-build<span class="o">()</span> <span class="o">{</span>
+    run-login
+    exec-build <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+</code></pre></div><h3 id="automatically-rebuild-commands-when-necessary-by-using-hash">Automatically rebuild commands when necessary by using hash</h3><p>Let&rsquo;s say we have a custom cli tool <code>.bin/mycli</code> that we use in our scripts. We can calculate the hash from the source of the tool and compare it with the local hash of the installed tool. If they are different, the script will automatically rebuild the tool and update the local hash.</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">run-mycli<span class="o">()</span> <span class="o">{</span>
+    build-mycli
+    <span class="nv">$PROJECT_ROOT</span>/.bin/mycli <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+build-mycli<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">hash</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$PROJECT_ROOT</span>/go/scripts/mycli/.hash 2&gt;/dev/null<span class="k">)</span>
+    rebuild-if-needed mycli <span class="s2">&#34;</span><span class="nv">$hash</span><span class="s2">&#34;</span> build-mycli-always
+<span class="o">}</span>
+build-mycli-always<span class="o">()</span> <span class="o">{</span>
+    mkdir -p <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin&#34;</span>
+    bash -c <span class="s2">&#34;cd </span><span class="nv">$PROJECT_ROOT</span><span class="s2">/go &amp;&amp; \
+</span><span class="s2">             go build -o </span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/mycli ./scripts/mycli &amp;&amp; \
+</span><span class="s2">             go run ./scripts/mycli calc-hash &amp;&gt;/dev/null&#34;</span>
+<span class="o">}</span>
+rebuild-if-needed<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">local</span> <span class="nv">bin</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span>
+    <span class="nb">local</span> <span class="nv">hash</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$2</span><span class="s2">&#34;</span>
+    <span class="nb">local</span> <span class="nv">build_script</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$3</span><span class="s2">&#34;</span>
+
+    mkdir -p <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin&#34;</span>
+    <span class="k">if</span> <span class="o">[[</span> ! <span class="k">$(</span>ls <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/</span><span class="nv">$bin</span><span class="s2">&#34;</span> 2&gt;/dev/null<span class="k">)</span> <span class="o">]]</span> <span class="o">||</span><span class="se">\
+</span><span class="se"></span>       <span class="o">[[</span> <span class="s2">&#34;</span><span class="nv">$hash</span><span class="s2">&#34;</span> !<span class="o">=</span> <span class="s2">&#34;</span><span class="k">$(</span>cat <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/</span><span class="nv">$bin</span><span class="s2">.hash&#34;</span> 2&gt;/dev/null<span class="k">)</span><span class="s2">&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nb">printf</span> <span class="s2">&#34;building... &#34;</span>
+        <span class="nv">$build_script</span>
+        <span class="nb">printf</span> <span class="s2">&#34;\r              \r&#34;</span>
+        <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$hash</span><span class="s2">&#34;</span> &gt; <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/.bin/</span><span class="nv">$bin</span><span class="s2">.hash&#34;</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+</code></pre></div><h2 id="references">References</h2><p><em>These scripts are put here for quickly setup your project:</em></p><p>.envrc</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span>  <span class="nv">PROJECT_ROOT</span><span class="o">=</span><span class="k">$(</span>git rev-parse --show-toplevel 2&gt;/dev/null<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">RELATIVE_PATH</span><span class="o">=</span><span class="k">$(</span>git rev-parse --show-prefix   2&gt;/dev/null<span class="k">)</span>
+
+PATH_add <span class="s2">&#34;</span><span class="nv">$PWD</span><span class="s2">&#34;</span>
+</code></pre></div><p>run</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -eo pipefail
+
+run-hello<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">echo</span> <span class="s2">&#34;Hello, World!&#34;</span>
+<span class="o">}</span>
+
+<span class="c1"># -------- this is the magic ------- #</span>
+<span class="nb">source</span> <span class="s2">&#34;</span><span class="nv">$PROJECT_ROOT</span><span class="s2">/scripts/_cli.sh&#34;</span>
+</code></pre></div><p>_cli.sh</p><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -eo pipefail
+
+show-help<span class="o">(){</span>
+    <span class="nv">items</span><span class="o">=()</span>
+    <span class="k">while</span> <span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="nb">read</span> -r line<span class="p">;</span> <span class="k">do</span> <span class="nv">items</span><span class="o">+=(</span><span class="s2">&#34;</span><span class="nv">$line</span><span class="s2">&#34;</span><span class="o">)</span><span class="p">;</span> <span class="k">done</span> &lt; <span class="se">\
+</span><span class="se"></span>        &lt;<span class="o">(</span><span class="nb">compgen</span> -A <span class="s2">&#34;function&#34;</span> <span class="p">|</span> grep <span class="s2">&#34;run-&#34;</span> <span class="p">|</span> sed <span class="s2">&#34;s/run-//&#34;</span><span class="o">)</span>
+    <span class="nb">printf</span> -v items <span class="s2">&#34;\t%s\n&#34;</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">items</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&#34;</span>
+
+    <span class="nv">usage</span><span class="o">=</span><span class="s2">&#34;USAGE: </span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$0</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2"> CMD [ARGUMENTS]
+</span><span class="s2">  CMD:\n</span><span class="nv">$items</span><span class="s2">&#34;</span>
+    <span class="nb">printf</span> <span class="s2">&#34;</span><span class="nv">$usage</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+<span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="k">case</span> <span class="s2">&#34;</span><span class="nv">$name</span><span class="s2">&#34;</span> in
+    <span class="s2">&#34;&#34;</span> <span class="p">|</span> <span class="s2">&#34;-h&#34;</span> <span class="p">|</span> <span class="s2">&#34;--help&#34;</span> <span class="p">|</span> <span class="s2">&#34;help&#34;</span><span class="o">)</span>
+        show-help
+        <span class="p">;;</span>
+    *<span class="o">)</span>
+        <span class="nb">shift</span>
+        <span class="k">if</span> <span class="nb">compgen</span> -A <span class="s2">&#34;function&#34;</span> <span class="p">|</span> grep <span class="s2">&#34;run-</span><span class="nv">$name</span><span class="s2">&#34;</span> &gt;/dev/null <span class="p">;</span> <span class="k">then</span>
+            run-<span class="s2">&#34;</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$@</span><span class="s2">&#34;</span>
+        <span class="k">else</span>
+            <span class="nb">echo</span> <span class="s2">&#34;ERROR: run-</span><span class="nv">$name</span><span class="s2"> not found.&#34;</span>
+            <span class="nb">exit</span> <span class="m">123</span>
+        <span class="k">fi</span>
+        <span class="p">;;</span>
+<span class="k">esac</span>
+</code></pre></div><h2 id="conclusion">Conclusion</h2><p>By integrating <code>direnv</code> and <code>run</code> scripts into our development workflow, we can create a powerful, efficient, and consistent environment that greatly benefits the team. And so can you! 💪💪</p><p>They are easy to set up and use, saving you and your team a lot of time and effort. With <code>direnv</code>, you can set up environment variables for your project and make them available in all your scripts. With <code>run</code>, you can create a collection of functions that you can run from the command line, fine-tuned for each directory. Together, they can help you write and manage scripts more effectively as a team! 🚀🚀</p><h2 id="author">Author</h2><p>I'm Oliver Nguyen. A software maker working mostly in Go and JavaScript. I enjoy learning and seeing a better version of myself each day. Occasionally spin off new open source projects. Share knowledge and thoughts during my journey. <span>Connect with me on <a class="icon" target="_blank" rel="noopener" href="https://github.com/iOliverNguyen"><i class="fab fa-github"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://linkedin.com/in/iOliverNguyen"><i class="fab fa-linkedin"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://x.com/_OliverNguyen"><i class="fab fa-twitter"></i> </a>, <a class="icon" target="_blank" rel="noopener" href="https://iOliverNguyen.medium.com"><i class="fab fa-medium-m"></i> </a>and <a class="icon" target="_blank" rel="noopener" href="mailto:iOliverNguyen@gmail.com"><i class="fas fa-envelope"></i> </a>.</span></p></div></article><div id="header-post"><a id="menu-icon" href="/w"><i class="fas fa-chevron-left fa-lg"></i> <span class="icon-text">Back</span></a> <a id="menu-icon-tablet" href="/w"><i class="fas fa-chevron-left fa-lg"></i> <span class="icon-text">Back</span></a></div><div id="footer-post-container"><div id="footer-post"><div id="nav-footer" style="display:none"><ul></ul></div><div id="toc-footer" class="tog-footer" style="display:none"><script>console.log("content",'<nav id="TableOfContents">\n  <ul>\n    <li><a href="#direnv-automatically-set-environment-variables-base-on-the-current-directory">direnv: Automatically set environment variables base on the current directory</a>\n      <ul>\n        <li><a href="#setup-common-environment-variables-for-the-project">Setup common environment variables for the project</a></li>\n        <li><a href="#automatically-make-all-scripts-in-a-directory-available">Automatically make all scripts in a directory available</a></li>\n        <li><a href="#different-configurations-for-different-directories">Different configurations for different directories</a></li>\n        <li><a href="#verify-that-all-developers-use-the-same-tools-and-versions">Verify that all developers use the same tools and versions</a></li>\n        <li><a href="#include-parent-envrc-file">Include parent <code>.envrc</code> file</a></li>\n      </ul>\n    </li>\n    <li><a href="#run-a-simple-bash-script-to-manage-all-scripts-in-a-project">run: A simple bash script to manage all scripts in a project</a>\n      <ul>\n        <li><a href="#an-example">An example</a></li>\n        <li><a href="#_clish-make-all-functions-from-the-run-script-available">_cli.sh: make all functions from the <code>run</code> script available</a></li>\n        <li><a href="#explanation-how-does-it-work">Explanation: How does it work?</a></li>\n      </ul>\n    </li>\n    <li><a href="#using-direnv-and-run-in-practice">Using <code>direnv</code> and <code>run</code> in practice</a>\n      <ul>\n        <li><a href="#predefine-utilities-and-make-them-always-available-for-scripts">Predefine utilities and make them always available for scripts</a></li>\n        <li><a href="#require-developers-to-use-the-same-tools-and-versions">Require developers to use the same tools and versions</a></li>\n        <li><a href="#automatically-keep-submodules-up-to-date">Automatically keep submodules up-to-date</a></li>\n        <li><a href="#automatically-setup-local-environment">Automatically setup local environment</a></li>\n        <li><a href="#load-sensitive-secrets">Load sensitive secrets</a></li>\n        <li><a href="#automatically-rebuild-commands-when-necessary-by-using-hash">Automatically rebuild commands when necessary by using hash</a></li>\n      </ul>\n    </li>\n    <li><a href="#references">References</a></li>\n    <li><a href="#conclusion">Conclusion</a></li>\n  </ul>\n</nav>')</script><div class="toc-header"><a href="#">Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script</a></div><nav id="TableOfContents"><ul><li><a href="#direnv-automatically-set-environment-variables-base-on-the-current-directory">direnv: Automatically set environment variables base on the current directory</a><ul><li><a href="#setup-common-environment-variables-for-the-project">Setup common environment variables for the project</a></li><li><a href="#automatically-make-all-scripts-in-a-directory-available">Automatically make all scripts in a directory available</a></li><li><a href="#different-configurations-for-different-directories">Different configurations for different directories</a></li><li><a href="#verify-that-all-developers-use-the-same-tools-and-versions">Verify that all developers use the same tools and versions</a></li><li><a href="#include-parent-envrc-file">Include parent <code>.envrc</code> file</a></li></ul></li><li><a href="#run-a-simple-bash-script-to-manage-all-scripts-in-a-project">run: A simple bash script to manage all scripts in a project</a><ul><li><a href="#an-example">An example</a></li><li><a href="#_clish-make-all-functions-from-the-run-script-available">_cli.sh: make all functions from the <code>run</code> script available</a></li><li><a href="#explanation-how-does-it-work">Explanation: How does it work?</a></li></ul></li><li><a href="#using-direnv-and-run-in-practice">Using <code>direnv</code> and <code>run</code> in practice</a><ul><li><a href="#predefine-utilities-and-make-them-always-available-for-scripts">Predefine utilities and make them always available for scripts</a></li><li><a href="#require-developers-to-use-the-same-tools-and-versions">Require developers to use the same tools and versions</a></li><li><a href="#automatically-keep-submodules-up-to-date">Automatically keep submodules up-to-date</a></li><li><a href="#automatically-setup-local-environment">Automatically setup local environment</a></li><li><a href="#load-sensitive-secrets">Load sensitive secrets</a></li><li><a href="#automatically-rebuild-commands-when-necessary-by-using-hash">Automatically rebuild commands when necessary by using hash</a></li></ul></li><li><a href="#references">References</a></li><li><a href="#conclusion">Conclusion</a></li></ul></nav></div><div id="share-footer" class="tog-footer" style="display:none"><ul><li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fdirenv.run%2f&title=Upgrade%20your%20scripts%20using%20%27direnv%27%20and%20%27run%27%20script"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fdirenv.run%2f"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="https://x.com/share?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fdirenv.run%2f&text=Upgrade%20your%20scripts%20using%20%27direnv%27%20and%20%27run%27%20script"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fdirenv.run%2f&title=Upgrade%20your%20scripts%20using%20%27direnv%27%20and%20%27run%27%20script"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li><li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fiOliverNguyen.github.io%2fw%2fdirenv.run%2f&t=Upgrade%20your%20scripts%20using%20%27direnv%27%20and%20%27run%27%20script"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li></ul></div><div id="actions-footer"><a id="home" class="icon" href="/w"><i class="fas fa-chevron-left fa-lg" aria-hidden="true"></i> Back</a> <a id="toc" class="icon" href="#" onclick='return $(".tog-footer").toggle(),!1'><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a> <a id="share" class="icon" href="#" onclick='return $(".tog-footer").toggle(),!1'><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></div></div></div><footer id="footer"><div class="footer-left">Copyright &copy; 2024 Oliver Nguyen.</div><div class="footer-right"><nav><ul></ul></nav></div></footer></div></body><link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"><script src="/lib/jquery/jquery.min.js"></script><script src="/js/main.js"></script></html>

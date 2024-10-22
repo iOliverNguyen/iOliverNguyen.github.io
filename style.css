@@ -80,6 +80,18 @@ a.no-underline:not(:hover) {
   }
 }
 
+/* utilities */
+
+.more {
+  cursor: pointer;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* article */
+
 article .content h2,
 article .content h3,
 article .content h4,
@@ -156,13 +168,18 @@ article .content .highlight {
   background: #f0f0f0;
 }
 
+article .content blockquote {
+  margin: 1rem 0 2rem 0;
+  padding: 0.5rem 0;
+}
+
 article blockquote p {
   font-size: 1.2rem;
   font-style: italic;
   font-weight: 400;
   line-height: 1.5;
   margin: 0;
-  padding: 0 0 0 1.5rem;
+  padding: 0 0 0 1rem;
   color: #2b2b2b;
 }
 
@@ -197,6 +214,10 @@ article header .meta {
   margin-top: 1rem;
 }
 
+table th, table td {
+  font-size: 1rem;
+}
+
 @media (max-width: 499px) {
   article .content pre {
     padding: 1rem 1rem;
@@ -224,15 +245,19 @@ article header .meta {
   article .content,
   article .content p,
   article .content li {
-    font-size: 21px;
+    font-size: 1.3rem;
   }
 
   article .content code {
-    font-size: 17px;
+    font-size: 1.1rem;
   }
 
   article .content pre code {
-    font-size: 14px;
+    font-size: 0.9rem;
+  }
+
+  table th, table td {
+    font-size: 1.2rem;
   }
 }
 

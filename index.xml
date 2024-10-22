@@ -7,7 +7,150 @@
     
     <language>en-us</language>
     <copyright>Oliver Nguyen</copyright>
-    <lastBuildDate>Mon, 20 Mar 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Implement a Distributed State Machine with Redis to Migrate Billions of Records</title>
+      <link>https://iOliverNguyen.github.io/w/migrate/</link>
+      <pubDate>Sun, 20 Oct 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/migrate/</guid>
+      <description>As a start-up company, we started with a simple architecture: All data were stored in a single centralized Postgres instance, shared by a few services. It has been working well and allows us to move fast, deliver features, enter the market, acquire clients, and grow exponentially.
+Fast forward a couple of years, today we have thousands of clients and billions of records, it&amp;rsquo;s time to migrate the top tables from Postgres to a better solution.</description>
+    </item>
+    
+    <item>
+      <title>Zero2Prod: Day 3 – Setup database and sqlx</title>
+      <link>https://iOliverNguyen.github.io/w/z2p.3/</link>
+      <pubDate>Sat, 31 Aug 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/z2p.3/</guid>
+      <description>Database clients  tokio-postgres sqlx : use procedural macros to connect to database and verify the query at compile time diesel, macro.table : use cli to generate database schema in Rust code   Threads are for working in parallel, async is for waiting in parallel.
+    Crate Query interface Compile-time safety Async     tokio-postgres SQL No Yes   sqlx SQL Yes Yes   diesel DSL Yes No    Docker Setup run scripts</description>
+    </item>
+    
+    <item>
+      <title>Zero2Prod: Day 2 – Form, FromRequest, serde</title>
+      <link>https://iOliverNguyen.github.io/w/z2p.2/</link>
+      <pubDate>Fri, 30 Aug 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/z2p.2/</guid>
+      <description>A blog visitor can subscribe to the newsletter  She can submit a form with name and email. If both name and email are valid, we should return 200 OK Otherwise, return 400 Bad Request  Writing tests Build a multipart form:
+letform=multipart::Form::new().text(&amp;#34;name&amp;#34;,&amp;#34;Oliver Nguyen&amp;#34;).text(&amp;#34;email&amp;#34;,&amp;#34;oliver@example.com&amp;#34;);Create a new client and send the request:
+letaddr=spawn_app();letclient=reqwest::Client::new();letresp=client.post(&amp;amp;format!(&amp;#34;{}/subscribe&amp;#34;,addr)).multipart(form).send().await.expect(&amp;#34;Failed to send request&amp;#34;);Define FormData with #[derive(Serialize)]
+#[derive(Serialize)]struct FormData{name: String,email: String,}Add some test cases:
+asyncfn subscribe_returns_a_400_for_invalid_form_data(){struct TestCase{name: String,email: String,expected_error: String,}letaddr=spawn_app();letclient=reqwest::Client::new();lettestcases=vec!</description>
+    </item>
+    
+    <item>
+      <title>Zero2Prod: Day 1 – Writing tests</title>
+      <link>https://iOliverNguyen.github.io/w/z2p.1/</link>
+      <pubDate>Thu, 29 Aug 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/z2p.1/</guid>
+      <description>Extract the app logic to a function asyncfn main()-&amp;gt; std::io::Result&amp;lt;()&amp;gt;{let_=run().await?;Ok(())}pubfn run()-&amp;gt; Result&amp;lt;Server,std::io::Error&amp;gt;{letserver=HttpServer::new(||create_app()).bind(&amp;#34;127.0.0.1:8080&amp;#34;)?.run();Ok(server)}fn create_app()-&amp;gt; App&amp;lt;implServiceFactory&amp;lt;ServiceRequest,Config=(),Response=ServiceResponse,Error=actix_web::Error,InitError=(),&amp;gt;,&amp;gt;{App::new().route(&amp;#34;/health&amp;#34;,web::get().to(health)).route(&amp;#34;/&amp;#34;,web::get().to(greet)).route(&amp;#34;/{name}&amp;#34;,web::get().to(greet))} fn create_app() return an App that implements ServiceFactory trait. we need to provide all the type params: Response, Config, Error, InitError.  pubtraitServiceFactory&amp;lt;Req&amp;gt;{/// Responses given by the created services. type Response;/// Errors produced by the created services. type Error;/// Service factory configuration. type Config;/// The kind of `Service` created by this factory. type Service: Service&amp;lt;Req,Response=Self::Response,Error=Self::Error&amp;gt;;/// Errors potentially raised while building a service.</description>
+    </item>
+    
+    <item>
+      <title>Zero2Prod: Day 0 – Hello actix and tokio</title>
+      <link>https://iOliverNguyen.github.io/w/z2p.0/</link>
+      <pubDate>Wed, 28 Aug 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/z2p.0/</guid>
+      <description>I&amp;rsquo;m start learning Rust by following the excellent book Zero to Production by Luca Palmieri. The book introduce to async programming in Rust by implementing an email newsletter.
+ Resources: Code on GitHub Reviews by Chris Allen References: actix.rs, actix-web, actix/examples, tokio.rs  Building an email newsletter  A blog visitor can subscribe to the newsletter, and receive emails. The blog author can send an email to all subscribers. A blog subscriber can unsubscribe from the newsletter.</description>
+    </item>
+    
+    <item>
+      <title>How to live on 24 hours a day – by Arnold Bennett</title>
+      <link>https://iOliverNguyen.github.io/w/live.24h/</link>
+      <pubDate>Wed, 31 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/live.24h/</guid>
+      <description>“How to Live on 24 Hours a Day” is a classic self-help book written by Arnold Bennett, first published in 1910. The book is a practical guide on time management and personal development, emphasizing the importance of making the most out of each day.
+Bennett argues that time is the most valuable resource we have and that many people waste it without realizing it. He suggests simple but effective ways to structure your day to include both work and personal development activities, such as reading, reflecting, and improving oneself.</description>
+    </item>
+    
+    <item>
+      <title>Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script</title>
+      <link>https://iOliverNguyen.github.io/w/direnv.run/</link>
+      <pubDate>Wed, 24 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/direnv.run/</guid>
+      <description>In JavaScript/Node world, we usually store scripts in package.json and run them using npm. In other worlds, we use Makefile or create a directory and put all our scripts there. But there is a better way to manage and run scripts for your team. No, I&amp;rsquo;m not talking about Warp or other pricey fancy tools.
+I will share about direnv and our old friend bash: How we are using them to effectively write and manage scripts as a team.</description>
+    </item>
+    
+    <item>
+      <title>Refactor: GoroutineTracker with unnecessary usage of reflect</title>
+      <link>https://iOliverNguyen.github.io/w/go.tracker/</link>
+      <pubDate>Tue, 02 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/go.tracker/</guid>
+      <description>Today, I encountered this code in my company codebase (the code and comments are rewritten for demo purpose and do not include any proprietary code):
+type GoroutineTracker struct { wg sync.WaitGroup // ... some other fields } // Go starts a new goroutine and tracks it with some metrics. func (g *GoroutineTracker) Go(ctx context.Context, name string, f any, args ...any) { fn := reflect.TypeOf(f) if fn.Kind() != reflect.Func { panic(&amp;#34;must be function&amp;#34;) } if fn.</description>
+    </item>
+    
+    <item>
+      <title>ezpkg.io - Collection of packages to make writing Go code easier</title>
+      <link>https://iOliverNguyen.github.io/w/ezpkg/</link>
+      <pubDate>Wed, 26 Jun 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/ezpkg/</guid>
+      <description>As I work on various Go projects, I often find myself creating utility functions, extending existing packages, or developing packages to solve specific problems. Moving from one project to another, I usually have to copy or rewrite these solutions. So I created ezpkg.io to have all these utilities and packages in one place. Hopefully, you&amp;rsquo;ll find them useful as well.
+
+The logo is Gopherz - which I created using DALL-E  Let&amp;rsquo;s look at some problems that these packages are solving.</description>
+    </item>
+    
+    <item>
+      <title>GitHub PRs on MacOS Menu Bar</title>
+      <link>https://iOliverNguyen.github.io/w/github.swiftbar/</link>
+      <pubDate>Thu, 28 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/github.swiftbar/</guid>
+      <description>I usually push a lot of PRs in form of stacked PRs to GitHub. It&amp;rsquo;s quite annoying to go through each PR to see the check status. So I created this plugin to show my PRs on the menu bar. — Now, everything is just a click away!
+Features 1. Top PRs section  List of your chosen PRs, sorted by your order. You can customize the list of PRs in this section by updating the file github.</description>
+    </item>
+    
+    <item>
+      <title>TIL: String type with a specific length in TypeScript</title>
+      <link>https://iOliverNguyen.github.io/w/microuuid/</link>
+      <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/microuuid/</guid>
+      <description>We&amp;rsquo;ll declare a Phantom Type:
+type StringN&amp;lt;N&amp;gt; = string &amp;amp; { length: N; readonly X: unique symbol; } const isStringN = &amp;lt;N extends number&amp;gt;(length: N, s: string): s is StringN&amp;lt;N&amp;gt; =&amp;gt; s.length == length; export const stringN = &amp;lt;N extends number&amp;gt;(length: N, s: string): StringN&amp;lt;N&amp;gt; =&amp;gt; { if (!isStringN(length, s)) throw new Error(`input must have length ${length}`); return s; } Then we can use it as below:
+export type MicroUuid = StringN&amp;lt;4&amp;gt;; export const microUuid = () =&amp;gt; stringN(4, newUuid().</description>
+    </item>
+    
+    <item>
+      <title>TIL: console.log with color</title>
+      <link>https://iOliverNguyen.github.io/w/logcolor/</link>
+      <pubDate>Tue, 15 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/logcolor/</guid>
+      <description>We can use this pattern to output log with color in browser by adding CSS:
+const logger = (name) =&amp;gt; ({ info: console.info.bind(console, `%c${name}: %s`, &amp;#39;color: #56d74b&amp;#39;), verbose: console.debug.bind(console, `%c${name}: %s`, &amp;#39;color: #70818e&amp;#39;), }) </description>
+    </item>
+    
+    <item>
+      <title>My work on the flow compiler for sending campaigns and auto reply</title>
+      <link>https://iOliverNguyen.github.io/w/flow.compiler/</link>
+      <pubDate>Thu, 10 Aug 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/flow.compiler/</guid>
+      <description>At work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors. The use cases are to provide our users the ability to automatically response to their customers&#39; messages. Users can define their own flow and customize auto reply behaviours. This article gives a look into my work. Also see related article.
+ Package flow implements the flow document compiler and runtime controller. The compiler is responsible for parsing the flow document and compiling it into a specific format for that flow document type, and can be executed by a runtime engine.</description>
+    </item>
+    
+    <item>
+      <title>TIL: Auto-reload a command when files changed using entr</title>
+      <link>https://iOliverNguyen.github.io/w/entr/</link>
+      <pubDate>Mon, 15 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://iOliverNguyen.github.io/w/entr/</guid>
+      <description>While working with Go and JavaScript, we have tools available for auto reloading the server when the code changes. For JavaScript, we even have hot reload which reloads part of the page without reloading the whole page. But for Python, we don&amp;rsquo;t have such tools, I tried livereload, but it does not work well for nested directories. So I decided to do it myself. And there is a tool called entr which helps run a command when some file changes.</description>
+    </item>
+    
     <item>
       <title>Pull data from HackerNews API and dump to JSON files</title>
       <link>https://iOliverNguyen.github.io/w/hackernews/</link>
@@ -16,7 +159,7 @@
       <guid>https://iOliverNguyen.github.io/w/hackernews/</guid>
       <description>I wrote a simple script to download the HackerNews data from HackerNews API. It downloads the data in JSON format and stores it as a collection of files. The first time it runs, it will create the directory data to store the data. Subsequent runs will update the data in the directory.
 At the time of this writing, the HackerNew database has about 35 million items.
-Usage cd hackernews direnv allow go run .</description>
+Usage git clone https://github.com/iOliverNguyen/hackernews-dump cd hackernews direnv allow go run .</description>
     </item>
     
     <item>
@@ -25,8 +168,8 @@ Usage cd hackernews direnv allow go run .</description>
       <pubDate>Wed, 15 Mar 2023 00:00:00 +0000</pubDate>
       
       <guid>https://iOliverNguyen.github.io/w/flow.doc/</guid>
-      <description>At my work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors.
-Flow documents are a collection of nodes and edges, which are JSON objects. They are used to describe the flow of an automation chatbot. The flow compiler takes a flow document and compile it into an ETA flow descriptor, that is used by the ETA engine to run the flow. ETA is short for &amp;ldquo;Event-Action-Trigger&amp;rdquo;, a programming paradigm that is used to describe how to react (&amp;ldquo;action&amp;rdquo;) with each event matching a specific condition (&amp;ldquo;trigger&amp;rdquo;).</description>
+      <description>At work, I&amp;rsquo;m working on the flow compiler, which compile from flow documents into ETA flow descriptors. You can read more details in this article.
+Flow documents are a collection of nodes and edges, which are JSON objects. They are used to describe the flow of an automation chatbot. The flow compiler takes a flow document and compile it into an ETA flow descriptor, that is used by the ETA engine to run the flow.</description>
     </item>
     
     <item>
@@ -35,11 +178,12 @@ Flow documents are a collection of nodes and edges, which are JSON objects. They
       <pubDate>Sun, 19 Feb 2023 00:00:00 +0000</pubDate>
       
       <guid>https://iOliverNguyen.github.io/w/stacked.prs/</guid>
-      <description>I usually work with stacked PRs. It is a great way to organize my work. I was using sapling and it works really well. I can view stacked commits with sl smart logs, edit many files and make changes to many commits at the same time with sl absorb, have the stack automatically rebase after each change, and push these commits as multiple stacked GitHub PRs with a single sl pr command.</description>
+      <description>I usually work with stacked PRs. It is a great way to organize my work and keep my commits small. This empowers separation of concern and limit scope of each PR. Reviewers can go through each PR and review them one by one. Smaller changes, better feedback!
+ I was using sapling. It worked really well in the first month, but the honeymoon ended too soon. Read more... Using sapling, I can view stacked commits with sl smart logs, edit many files and make changes to many commits at the same time with sl absorb, have the stack automatically rebase after each change, and push these commits as multiple stacked GitHub PRs with a single sl pr command.</description>
     </item>
     
     <item>
-      <title>Where does Github CLI store its credentials?</title>
+      <title>TIL: Where does Github CLI store its credentials?</title>
       <link>https://iOliverNguyen.github.io/w/github.cli/</link>
       <pubDate>Sat, 07 Jan 2023 00:00:00 +0000</pubDate>
       

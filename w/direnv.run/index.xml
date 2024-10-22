@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/direnv.run/</link>
+    <description>Recent content in Upgrade your scripts using &#39;direnv&#39; and &#39;run&#39; script on Oliver Nguyen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate>Wed, 24 Jul 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://iOliverNguyen.github.io/w/direnv.run/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

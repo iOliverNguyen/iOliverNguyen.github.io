@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Errors, Errors Everywhere: How We Centralized and Structured Error Handling on Oliver Nguyen</title>
+    <link>https://iOliverNguyen.github.io/w/namespace.error/</link>
+    <description>Recent content in Errors, Errors Everywhere: How We Centralized and Structured Error Handling on Oliver Nguyen</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>Oliver Nguyen</copyright>
+    <lastBuildDate></lastBuildDate>
+    <atom:link href="https://iOliverNguyen.github.io/w/namespace.error/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

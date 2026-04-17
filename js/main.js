@@ -135,14 +135,20 @@ $(document).ready(function () {
       });
     }
 
-    if ($('#TableOfContents').length) {
+    if ($('#toc-footer #TableOfContents').length) {
       // if [class=alt] is present, hide previous content
-      $('#TableOfContents .alt').map((_, elem) => {
-        elem.previousSibling.remove();
+      $('#toc-footer #TableOfContents .alt').map((_, elem) => {
+        let list = [];
+        let prev = elem.previousSibling;
+        while (prev) {
+          list.push(prev);
+          prev = prev.previousSibling;
+        }
+        for (let x of list) { x.remove() }
       });
 
       // always show footer-post after navigating
-      $('#TableOfContents a').click(() => {
+      $('#toc-footer #TableOfContents a').click(() => {
         justClickedTOC = true;
       });
     }

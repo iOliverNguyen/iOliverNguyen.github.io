@@ -1,0 +1,59 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .label { font-family: sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; fill: #333; }
+      .label-a { font-family: sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; fill: #d32f2f; }
+      .label-b { font-family: sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; fill: #1976d2; }
+      .payoff { font-family: sans-serif; font-size: 20px; font-weight: bold; text-anchor: middle; }
+      .payoff-a { fill: #d32f2f; }
+      .payoff-b { fill: #1976d2; }
+      .player-label { font-family: sans-serif; font-size: 20px; font-weight: bold; fill: #333; }
+      .player-label-a { font-family: sans-serif; font-size: 20px; font-weight: bold; fill: #d32f2f; }
+      .player-label-b { font-family: sans-serif; font-size: 20px; font-weight: bold; fill: #1976d2; }
+      .cell-bg { fill: #f5f5f5; stroke: #ccc; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <!-- Matrix Grid -->
+  <rect x="150" y="100" width="150" height="100" class="cell-bg" />
+  <rect x="300" y="100" width="150" height="100" class="cell-bg" />
+  <rect x="150" y="200" width="150" height="100" class="cell-bg" />
+  <rect x="300" y="200" width="150" height="100" class="cell-bg" />
+
+  <!-- Player Labels -->
+  <text x="50" y="200" class="player-label-a" transform="rotate(-90 50,200)">Player A</text>
+  <text x="300" y="50" class="player-label-b" text-anchor="middle">Player B</text>
+
+  <!-- Strategies -->
+  <text x="110" y="155" class="label-a" text-anchor="end">Volunteer</text>
+  <text x="110" y="255" class="label-a" text-anchor="end">Ignore</text>
+
+  <text x="225" y="85" class="label-b">Volunteer</text>
+  <text x="375" y="85" class="label-b">Ignore</text>
+
+  <!-- Payoffs -->
+  <!-- (Volunteer, Volunteer) -->
+  <text x="200" y="145" class="payoff payoff-a">6</text>
+  <text x="210" y="145" class="payoffvar" dx="5">,</text>
+  <text x="250" y="165" class="payoff payoff-b">6</text>
+
+  <!-- (Volunteer, Ignore) -->
+  <text x="350" y="145" class="payoff payoff-a">6</text>
+  <text x="360" y="145" class="payoffvar" dx="5">,</text>
+  <text x="400" y="165" class="payoff payoff-b">10</text>
+
+  <!-- (Ignore, Volunteer) -->
+  <text x="200" y="245" class="payoff payoff-a">10</text>
+  <text x="210" y="245" class="payoffvar" dx="5">,</text>
+  <text x="250" y="265" class="payoff payoff-b">6</text>
+
+  <!-- (Ignore, Ignore) -->
+  <text x="350" y="245" class="payoff payoff-a">0</text>
+  <text x="360" y="245" class="payoffvar" dx="5">,</text>
+  <text x="400" y="265" class="payoff payoff-b">0</text>
+
+  <!-- Legend -->
+  <text x="300" y="350" class="label" font-size="14" font-weight="normal">
+    <tspan fill="#d32f2f">Red: Player A Payoff</tspan> • <tspan fill="#1976d2">Blue: Player B Payoff</tspan>
+  </text>
+</svg>

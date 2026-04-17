@@ -335,14 +335,14 @@ body .h2 {
   display: block;
   margin-top: 2rem;
   margin-bottom: 0.5rem;
-  color: rgba(86,124,119,0.8);
+  color: #cc2a41;
   text-transform: none;
   letter-spacing: normal;
   font-weight: bold;
   font-size: 1rem;
 }
 body h3 {
-  color: rgba(86,124,119,0.8);
+  color: #cc2a41;
   text-decoration: underline;
   font-weight: bold;
   font-size: 0.9rem;
@@ -421,12 +421,12 @@ body table {
   text-align: left;
   font-size: 12px;
   overflow: auto;
-  display: block;
+  display: table;
 }
 body th {
   padding: 8px;
   border-bottom: 1px dashed #666;
-  color: rgba(86,124,119,0.8);
+  color: #cc2a41;
   font-weight: bold;
   font-size: 13px;
 }
@@ -460,7 +460,7 @@ html {
 body {
   margin: 0;
   height: 100%;
-  background-color: #fafafa;
+  background-color: #f2f0ee;
   color: #22272a;
   font-display: swap;
   font-weight: 400;
@@ -869,14 +869,14 @@ body {
     display: none;
   }
 }
-@media screen and (max-width: 900px) {
-  #header-post #menu-icon {
-    display: none;
-  }
-  #header-post #actions {
-    display: none;
-  }
-}
+/*@media screen and (max-width: 900px) {*/
+/*  #header-post #menu-icon {*/
+/*    display: none;*/
+/*  }*/
+/*  #header-post #actions {*/
+/*    display: none;*/
+/*  }*/
+/*}*/
 @media screen and (max-width: 1199px) {
   #header-post #toc {
     display: none;
@@ -1323,7 +1323,7 @@ article .content .caption {
   background-image: none;
 }
 .pagination a:hover:not(.active) {
-  color: rgba(86,124,119,0.8);
+  color: #cc2a41;
 }
 .search-input {
   padding: 4px 7px;
@@ -1331,7 +1331,7 @@ article .content .caption {
   outline: none;
   border: solid 1px #666;
   border-radius: 5px;
-  background-color: #fafafa;
+  background-color: #f2f0ee;
   color: #22272a;
   font-size: 1.2rem;
   -webkit-border-radius: 5px;
@@ -1391,7 +1391,7 @@ article .content .caption {
   display: none;
   padding: 0.2em 0.5em;
   -webkit-font-smoothing: subpixel-antialiased;
-  color: #fafafa;
+  color: #f2f0ee;
   font-display: swap;
   font-weight: 400;
   font-size: 11.200000000000001px;
